@@ -1,0 +1,3 @@
+    [submodule "libs/@LLSELib"]
+    path = libs/@LLSELib
+    url = https://github.com/PowerNukkitX/LLSE-Lib/tree/master/%40LLSELib
