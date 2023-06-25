@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+      "target": "es2022",
+      "module": "es2022",
+      "outDir": "./dist/@NWeaponRe",
+      "strict": true,
+      "esModuleInterop": true,
+      "noEmitHelpers": true,
+      "lib": ["es6", "dom", "ES2022"],
+      "paths": {
+        "@LLSELib": ["./libs/@LLSELib/index.js"],
+        "@LLSELib/*": ["./libs/@LLSELib/*"]
+      }
+    },
+    "baseUrl": "./",
+    "include": [
+        "./src/**/*",
+        "./libs/**/*.d.ts"
+    ]
+  }
+  
