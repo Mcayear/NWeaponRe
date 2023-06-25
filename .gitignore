@@ -1,2 +1,4 @@
-/libs/@LLSELib
+/libs/@LLSELib/
+/.git/
 /.idea/
+/dist/
