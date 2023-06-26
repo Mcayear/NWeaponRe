@@ -8,8 +8,8 @@
       "noEmitHelpers": true,
       "lib": ["es6", "dom", "ES2022"],
       "paths": {
-        "@LLSELib": ["./libs/@LLSELib/index.js"],
-        "@LLSELib/*": ["./libs/@LLSELib/*"]
+        "@LLSELib": ["./libs/LLSELib/@LLSELib/index.js"],
+        "@LLSELib/*": ["./libs/LLSELib/@LLSELib/*"]
       }
     },
     "baseUrl": "./",
