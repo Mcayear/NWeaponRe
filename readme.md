@@ -17,7 +17,18 @@ cd NWeaponRe
 
 执行编译
 ```
-tsc
+npm run comp
 ```
 
-编译完成后可以在`./dist/@NWeaponRe`目录找到插件本体
+### 快速构建
+你需要先安装打包所需的第三方archiver包，可以直接
+```
+npm install
+```
+
+然后执行构建
+```
+npm run build
+```
+
+构建完成后可以在`./dist/@NWeaponRe.zip`找到压缩包

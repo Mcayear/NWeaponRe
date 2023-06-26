@@ -12,6 +12,9 @@
         "@LLSELib/*": ["./libs/LLSELib/@LLSELib/*"]
       }
     },
+    "scripts": {
+      "comp": "tsc && npm run scripts/moveYaml.js",
+    },
     "baseUrl": "./",
     "include": [
         "./src/**/*",

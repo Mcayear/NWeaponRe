@@ -36,7 +36,7 @@ async function start() {
 
     const Util = new UtilClass();
     const server = Server.getInstance();
-    const NWeaponSkill:any = null;
+    const NWeaponSkill: any = null;
 
     if (!contain('NWeapon_C')) {// todo: 防止重复 NWeapon_C
         exposeObject('NWeapon_C', _C);
@@ -67,7 +67,7 @@ async function start() {
      * @param {any} obj 
      * @returns 
      */
-    function addTimeoutTask(timestamp: number, obj: { func: (uid: any) => void; args: string[]; }) {
+    function addTimeoutTask(timestamp: number, obj: { func: (uid: string) => void; args: any[]; }) {
         while (TaskExecList.has(timestamp)) {
             timestamp++;
         }
@@ -718,13 +718,5 @@ export function main() {
 }
 
 export function close() {
-    for (const i of Server.getInstance().getLevels().values()) { // Clear all the JS entities.
-        /** @type {cn.nukkit.level.Level} */
-        const level = i;
-        level.getEntities().forEach(e => {
-            if (e instanceof FloatTextEntity) {
-                e.close();
-            }
-        })
-    }
+    // 清除副作用
 }
