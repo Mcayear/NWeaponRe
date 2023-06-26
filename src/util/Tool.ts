@@ -21,8 +21,41 @@ export interface ItemConfigType {
         [key: string]: number | string;
     }
     锻造词条: string;
-}
+    外形: [string, number];
+    名字: string;
+    附魔: string[];
+    属性: {
+        [key: string]: number | string;
+    }
+    不显示属性: string;
+    镶嵌: string[];
+    可副手?: boolean;
+    类型: string;
+    限制等级: number;
+    品阶: number;
+    稀有度: number;
+    介绍: string;
+    可符文?: boolean;
+    无限耐久?: boolean;
+    耐久?: number;
 
+    符文?: string;
+    符文类型?: string;
+    类别?: string;
+
+    直升?: number;
+    幸运?: number;// float
+    堆叠使用?: boolean;
+    失败保护?: boolean;
+    禁止上架?: boolean;
+    染色?: {
+        r: number
+        g: number
+        b: number
+    }
+    消耗?: boolean;
+    强度?: number;// float
+}
 export interface PaperConfigType {
     限制等级: number;
     消耗?: boolean;
@@ -69,26 +102,26 @@ export function getNukkitItem(data: [number | string, number], count?: number): 
 * @param data {any} 配置文件数据
 * @returns {JItem} nukkit的物品对象
 */
-export function getItem(name: string | null, data: any): JItem {
+export function getItem(name: string | null, data: ItemConfigType): JItem {
     const _C = contain('NWeapon_C');
     let item = getNukkitItem(data.外形);
-    name = name || <string>data.名字;
+    name = name || data.名字;
     item.setCustomName(name);
     if (data.附魔) {
         for (var i = 0; i < data.附魔.length; i++) {
             let arr = data.附魔[i].split(":");
-            blockitem.addItemEnchant(item, arr[0], arr[1]);
+            blockitem.addItemEnchant(item, parseInt(arr[0]), parseInt(arr[1]));
         }
     }
     let 属性 = [];
     if (data.属性) {
         for (let i in data.属性) {
-            if (typeof (data.属性[i]) == 'string' && data.属性[i].indexOf("-") > -1) {
+            if (typeof (data.属性[i]) == 'string' && (data.属性[i] as string).indexOf("-") > -1) {
                 属性.push("§r§7" + i + ": §b" + data.属性[i]);
                 continue;
             }
             if (_C.MainConfig.AttrDisplayPercent.indexOf(i) > -1) {
-                属性.push("§r§7" + i + ": §b" + Math.round(data.属性[i] * 100 * 10000) / 10000 + "%%");
+                属性.push("§r§7" + i + ": §b" + Math.round((data.属性[i] as number) * 100 * 10000) / 10000 + "%%");
             } else {
                 属性.push("§r§7" + i + ": §b" + data.属性[i]);
             }
@@ -178,17 +211,17 @@ export function getItem(name: string | null, data: any): JItem {
         }
         case "锻造石": {
             lore = "§r" + data.介绍;
-            if (data.强度) item.getNamedTag().putString('Strength', data.强度);
+            if (data.强度) item.getNamedTag().putFloat('Strength', data.强度);
             break;
         }
         case "精工石":
         case "宝石券":
         case "强化石": {
             lore = "§r" + data.介绍;
-            if (data.直升) item.getNamedTag().putString('StraightUp', data.直升);
-            if (data.幸运) item.getNamedTag().putString('Luck', data.幸运);
+            if (data.直升) item.getNamedTag().putInt('StraightUp', data.直升);
+            if (data.幸运) item.getNamedTag().putFloat('Luck', data.幸运);
             if (data.堆叠使用) item.getNamedTag().putString('stacking', "1");
-            if (data.失败保护) item.getNamedTag().putString('FailProtect', data.失败保护);
+            if (data.失败保护) item.getNamedTag().putByte('FailProtect', data.失败保护? 1 : 0);
             break;
         }
         case "符文": {
@@ -200,9 +233,9 @@ export function getItem(name: string | null, data: any): JItem {
                 "§r" + data.介绍,
                 "§r§7§l一一一一一一一一一一"
             ].join(";");
-            item.getNamedTag().putString('rune', data.符文);
-            item.getNamedTag().putString('runeType', data.符文类型);
-            item.getNamedTag().putString('type', data.类别);
+            item.getNamedTag().putString('rune', data.符文!);
+            item.getNamedTag().putString('runeType', data.符文类型!);
+            item.getNamedTag().putString('type', data.类别!);
             break;
         }
     }
@@ -679,9 +712,9 @@ export function examineNeed(needArray: string[], inv: Inventory, isCheck: boolea
         let arr = type[1].split(";");
         let info = arr[1];
         let count = 1;
-        let itemDataArr:any[] = arr[0].split(":");// Item Data.
+        let itemDataArr:string[] = arr[0].split(":");// Item Data.
         if (type[0] === "item") {
-            if (isNaN(itemDataArr[0])) {
+            if (isNaN(parseInt(itemDataArr[0]))) {
                 item = getNukkitItem([arr[0]+':'+arr[1], parseInt(arr[2])], parseInt(arr[3]));
                 count = parseInt(arr[3]);
             } else {
