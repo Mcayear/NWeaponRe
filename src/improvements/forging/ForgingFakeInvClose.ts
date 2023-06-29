@@ -27,7 +27,7 @@ export function ForgingFakeInvClose (event: com.nukkitx.fakeinventories.inventor
     var _C = contain('NWeapon_C');
     /** 玩家的一些临时数据 */
     var PlayerSmithingTempData = contain('PlayerSmithingTempData');
-    let PaperData: PaperConfigType = Tool.onlyNameGetItem('paper', drawing.getCustomName());
+    let PaperData: PaperConfigType|null = Tool.onlyNameGetItem('paper', drawing.getCustomName());
     if (!PaperData) {
         for (let item of inv.getContents().values()) {// 失败，返回所有材料
             blockitem.addItemToPlayer(player, item);
@@ -42,7 +42,7 @@ export function ForgingFakeInvClose (event: com.nukkitx.fakeinventories.inventor
         itemData = _C.WeaponConfig[weapon.getCustomName()] || _C.ArmorConfig[weapon.getCustomName()];
     } else {
         let tag = PlayerSmithingTempData.get(player.getName()).方案[1][0].split('@')[1].split(':');
-        itemData = Tool.onlyNameGetItem(tag[0], tag[1]);
+        itemData = Tool.onlyNameGetItem(tag[0], tag[1]) as ItemConfigType;
         weapon = Tool.getItem(null, itemData);
     }
 

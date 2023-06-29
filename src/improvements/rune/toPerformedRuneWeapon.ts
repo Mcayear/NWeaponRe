@@ -28,10 +28,10 @@ export function toUnperformedRuneWeapon(item: JItem): JItem {
  * @param count {?Number} 符文槽数量
  * @returns {JItem} 返回物品对象
  */
-export function toPerformedRuneWeapon(item: JItem, count: number): JItem {
+export function toPerformedRuneWeapon(item: JItem, count?: number): JItem {
     let runeBore: cn.nukkit.nbt.tag.ListTag<any> = item.getNamedTag().getList('runeBore');
     let bore = '';// 孔
-    var count = !count ? runeBore.size() : count;// 如果没有传入count
+    count = count ? runeBore.size() : count as number;// 如果没有传入count
     if (runeBore.size() < count) {
         for (let i = 0, len = count - runeBore.size(); i < len; i++) {
             runeBore.add(new StringTag('', ''));
@@ -45,7 +45,7 @@ export function toPerformedRuneWeapon(item: JItem, count: number): JItem {
         if (str.length) {
             const rune = onlyNameGetItem('rune', str);
             if (rune) {
-                str = rune.符文;// 通过文件名获取符文符号
+                str = rune.符文 as string;// 通过文件名获取符文符号
                 bore += '§r§7「' + str + '§r§7」';
                 if (i != len) {
                     bore += ' ';

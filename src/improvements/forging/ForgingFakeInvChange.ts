@@ -54,6 +54,11 @@ export function ForgingFakeInvChange(event: com.nukkitx.fakeinventories.inventor
                 let data = getNWeaponConfig(slotItem.getNamedTag().getString('NWeaponNameTag'));
                 if (newItem.getCustomName() === TempData[0] && newItem.getId() === TempData[1] && newItem.getDamage() === TempData[2]) {
                     if (TempData[3]) {
+                        if (!data) {
+                            player.sendMessage("[NWeapon] §c这不是有效的NWeapon装备，不能进行锻造");
+                            event.setCancelled(true);
+                            return;
+                        }
                         if (blockitem.getNBTString(newItem) != blockitem.getNBTString(Tool.getItem(TempData[0], data))) {
                             player.sendMessage("[NWeapon] §c你不能为这个NWeapon装备进行锻造");
                             event.setCancelled(true);

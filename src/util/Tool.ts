@@ -38,6 +38,9 @@ export interface ItemConfigType {
     可符文?: boolean;
     无限耐久?: boolean;
     耐久?: number;
+    不可镶嵌属性?: string[];
+    不可分解?: boolean;
+    分解所得: string;
 
     符文?: string;
     符文类型?: string;
@@ -264,8 +267,16 @@ export function getItem(name: string | null, data: ItemConfigType): JItem {
     }
     return item;
 }
-export function onlyNameGetItem(type: string, itemname: string): any;
-export function onlyNameGetItem(type: string, itemname: string, count: number | null, sender: JPlayer): JItem|null;
+
+/**
+ * 通过类型和名字获取物品对象
+ * @param type {string} 物品类型如：armor,weapon,gem
+ * @param itemname {string} 物品名字，文件名或者配置文件中的“名字”项
+ * @returns {JItem} nukkit的物品对象
+ */
+export function onlyNameGetItem(type: string, itemname: string): ItemConfigType|null;
+
+export function onlyNameGetItem(type: string, itemname: string, count: number): JItem|null;
 /**
  * 通过类型和名字获取物品对象
  * @param type {string} 物品类型如：armor,weapon,gem
@@ -274,9 +285,11 @@ export function onlyNameGetItem(type: string, itemname: string, count: number | 
  * @param sender {?JPlayer} 玩家，会对他发送回执信息
  * @returns {JItem} nukkit的物品对象
  */
+export function onlyNameGetItem(type: string, itemname: string, count: number, sender: JPlayer): JItem|null;
 export function onlyNameGetItem(type: string, itemname: string, count?: any, sender?: any): any {
     const _C = contain('NWeapon_C');
-    let obj, item = null;
+    let obj:ItemConfigType|null = null;
+    let item:JItem;
     type = type.toLocaleLowerCase();
     switch (type) {
         case "护甲":
@@ -317,7 +330,7 @@ export function onlyNameGetItem(type: string, itemname: string, count?: any, sen
             const file = File.readFrom("./plugins/NWeapon/OtherItem/" + itemname + ".yml");
             if (file) {
                 obj = JSON.parse(Util.YAMLtoJSON(<string>file));
-                itemname = obj.名字;
+                itemname = obj!.名字;
             }
             break;
         }
@@ -326,62 +339,39 @@ export function onlyNameGetItem(type: string, itemname: string, count?: any, sen
             return null;
         }
     }
-    if (obj === undefined || obj === null) {
+    if (obj === null) {
         if (sender) sender.sendMessage("[NWeapon] " + type + "物品 " + itemname + " §r不存在");
         return null;
-    } else {
-        if (typeof (obj) === "string") {
-            obj = JSON.parse(Util.YAMLtoJSON(obj));
-            itemname = obj.名字;
+    }
+    if (typeof (obj) === "string") {
+        obj = JSON.parse(Util.YAMLtoJSON(obj));
+        itemname = obj!.名字;
+    }
+    if (arguments.length === 2) {
+        return obj;// 如果只有 type, itemname 参数返回配置文件对象
+    }
+    item = getItem(itemname, obj!);
+    if (typeof (item) === "undefined") {
+        if (sender) sender.sendMessage("[NWeapon] " + type + "物品 " + itemname + " §r配置文件有误");
+        return null;
+    }
+    if (count !=null && !isNaN(count)) {
+        if (count > 64) {
+            count = 64;
+        } else if (count < 1) {
+            count = 1
         }
-        if (arguments.length === 2) {
-            return obj;// 如果只有 type,itemname 参数返回配置文件对象
-        }
-        item = getItem(itemname, obj);
-        if (typeof (item) === "undefined") {
-            if (sender) sender.sendMessage("[NWeapon] " + type + "物品 " + itemname + " §r配置文件有误");
-            return null;
-        }
-        if (count !=null && !isNaN(count)) {
-            if (count > 64) {
-                count = 64;
-            } else if (count < 1) {
-                count = 1
-            }
-            item.setCount(count);
-        }
+        item.setCount(count);
     }
     return item;
 }
-export interface NWeaponItemConfigType {
-    名字: string;
-    外形: [string, number];
-    附魔: string[];
-    类型: string;
-    可副手: boolean;
-    稀有度: number;
-    品阶: number;
-    介绍: string;
-    属性: {
-        [key: string]: number | string;
-    };
-    镶嵌: string[];
-    无限耐久: boolean;
-    限制等级: number;
-    是否在创造背包显示: boolean;
-    击杀提示: string;
-    定制者?: string;
-    生效槽?: number[];
-    套装?: string;
-    不可分解?: boolean;
-    分解所得?: string;
-}
+
 /**
  * 获取装备的配置
  * @param {string} itemTag 类似 Weapon;鬼墨的大保剑
  * @returns 
  */
-export function getNWeaponConfig(itemTag: string): NWeaponItemConfigType | null {
+export function getNWeaponConfig(itemTag: string): ItemConfigType | null {
     const _C = contain('NWeapon_C');
 	const index_ = itemTag.indexOf(";");
 	const arr = [itemTag.substr(0, index_), itemTag.substr(index_+1)];
@@ -563,7 +553,7 @@ export function toPerformedRuneWeapon(item: JItem, count: any): JItem {
         if (str.length) {
             const rune = onlyNameGetItem('rune', str);
             if (rune) {
-                str = rune.符文;// 通过文件名获取符文符号
+                str = rune.符文 as string;// 通过文件名获取符文符号
                 bore += '§r§7「' + str + '§r§7」';
                 if (i != len) {
                     bore += ' ';
@@ -744,7 +734,7 @@ export function examineNeed(needArray: string[], inv: Inventory, isCheck: boolea
             NeedMoney += Number(arr[0]);
             continue;
         } else if (type[0] === "nweapon") {
-            item = onlyNameGetItem(arr[0], arr[1]);
+            item = onlyNameGetItem(arr[0], arr[1], 1);
             tag1:
             if (item) {
                 let ntag = item.getNamedTag().getString('NWeaponNameTag');
