@@ -12,7 +12,6 @@ interface AttrObject {
     [key: string]: number[];
 }
 
-// TODO: sendRuneInlayWin
 // TODO: sendRuneTakeWin
 async function start() {
     const {
@@ -28,7 +27,8 @@ async function start() {
     const { checkAttr } = await import('./improvements/check/check.js');
     const { sendGemInlayWin } = await import('./enhancements/gem/sendGemInlayWin.js');
     const { sendStrengthenWin } = await import('./enhancements/strength/sendStrengthenWin.js');
-    const { toPerformedRuneWeapon } = await import('./improvements/rune/toPerformedRuneWeapon.js')
+    const { toPerformedRuneWeapon } = await import('./improvements/rune/toPerformedRuneWeapon.js');
+    const { sendRuneInlayWin } = await import('./enhancements/rune/sendRuneInlayWin.js');
     
 
     const blockitem = await import("./util/blockitem.js");
@@ -453,7 +453,7 @@ async function start() {
                 }
                 switch (res.runeAction) {
                     case "inlay": // 镶嵌
-                        //TODO: sendRuneInlayWin(sender);
+                        sendRuneInlayWin(sender);
                         break;
                     case "take": // 拆卸
                         //TODO: sendRuneTakeWin(sender);
@@ -510,7 +510,7 @@ async function start() {
                         break;
                     }
                     default:
-                        //TODO: sendRuneInlayWin(sender);
+                        sendRuneInlayWin(sender);
                         break;
                 }
                 break;
