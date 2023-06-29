@@ -11,12 +11,6 @@ declare namespace java.lang {
     declare type Object = globalThis.Object;
 }
 
-declare namespace java.util {
-    declare type List<T> = globalThis.Array<T>;
-    declare type Set<T> = globalThis.Set<T>;
-    declare type Map<K, V> = globalThis.Map<K, V>;
-}
-
 declare namespace cn.vusv.njsutil {
     declare class FloatTextEntity extends cn.nukkit.entity.mob.EntityMob {
         public constructor(chunk: cn.nukkit.level.format.FullChunk, nbt: cn.nukkit.nbt.tag.CompoundTag): void

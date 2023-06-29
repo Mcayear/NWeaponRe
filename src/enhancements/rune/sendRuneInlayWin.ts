@@ -1,7 +1,7 @@
 import * as blockitem from '../../util/blockitem.js';
-import * as inventory from '../../util/inventory.js';
 import * as Tool from '../../util/Tool.js';
 const { toPerformedRuneWeapon } = await import('../../improvements/rune/toPerformedRuneWeapon.js');
+import {StringTag} from 'cn.nukkit.nbt.tag.StringTag';
 
 import { mc } from '@LLSELib';
 
@@ -25,7 +25,7 @@ export function sendRuneInlayWin(player: JPlayer) {
     }
     let runeBoreIndex = -1;
     for (let i = 0; i < runeBore.size(); i++) {
-        const str = runeBore.get(i).parseValue();// 存储的 符文名
+        const str = runeBore.get(i).parseValue() as any as string;// 存储的 符文名
         if (!str.length) {
             runeBoreIndex = i;
             break;
@@ -36,24 +36,28 @@ export function sendRuneInlayWin(player: JPlayer) {
     }
     let invItems = player.getInventory().getContents();// 玩家背包
     // 遍历玩家背包将 可用的符文 添加到haveRuneList和usableRuneList
-    const win = window.getSimpleWindowBuilder("符文镶嵌", "符文镶嵌成功率100%%，且可拆卸");
+    let winx = mc.newSimpleForm();
+    winx.setTitle("符文镶嵌");
+    winx.setContent("符文镶嵌成功率100%%，且可拆卸");
     let usableRuneList:string[] = [];// 用于显示
     let haveRuneList:JItem[] = [];// 用于存储item对象
+    const _C = contain('NWeapon_C');
     for (let [index, invItem] of invItems) {
-        let data = RuneConfig[invItem.getCustomName()];// 通过物品名获取配置数据
+        let data = _C.RuneConfig[invItem.getCustomName()];// 通过物品名获取配置数据
         if (data) {
             let bind = invItem.getNamedTag().getString('PlayerBind');
             if (bind && JSON.parse(bind).name != player.getName()) {// 检查物品绑定
                 continue;
             }
             usableRuneList.push(invItem.getCustomName());
-            win.buildButton(invItem.getCustomName(), '');
+            winx.addButton(invItem.getCustomName(), '');
             invItem.setCount(1);
             haveRuneList.push(invItem);
         }
     }
-    win.showToPlayer(player, function (event) {
-        const sel = window.getEventResponseText(event);
+    
+    mc.getPlayer(player.getName())!.sendForm(winx, function (btnId:number) {
+        const sel = winx._Form.getButtons().get(btnId).getText();
         if (sel === "请选择") {
             return player.sendMessage("[NWeapon] §7未选择符文，已取消镶嵌");
         }
@@ -72,11 +76,11 @@ export function sendRuneInlayWin(player: JPlayer) {
                 }
             }
         }
-        if (!blockitem.isSame(HandItem, blockitem.getItemInHand(player), true, true)) {
+        if (!HandItem.equals(blockitem.getItemInHand(player))) {
             return player.sendMessage("[NWeapon] §c手持物品发生变更");
         }
         let runeData = Tool.onlyNameGetItem('rune', sel);
-        runeBore.add(runeBoreIndex, new StringTag('', sel));// sel是显示名字
+        runeBore.add(runeBoreIndex, new StringTag('', sel) as any);// sel是显示名字
         HandItem = toPerformedRuneWeapon(HandItem);// 更新物品lore
         blockitem.setItemInHand(player, HandItem);
         blockitem.removeItemFromPlayer(player, rune);

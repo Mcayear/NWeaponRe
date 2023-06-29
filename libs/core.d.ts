@@ -12,7 +12,42 @@ declare namespace java.lang {
 }
 
 declare namespace java.util {
-    declare type List<T> = globalThis.Array<T>;
+    export interface List<T> {
+        size(): number;
+        isEmpty(): boolean;
+        contains(o: Object): boolean;
+        toArray(): T[];
+        add(e: T): boolean;
+        remove(o: Object): boolean;
+        containsAll(c: List<T>): boolean;
+        addAll(c: List<T>): boolean;
+        removeAll(c: List<T>): boolean;
+        retainAll(c: List<T>): boolean;
+        clear(): void;
+        equals(o: Object): boolean;
+        hashCode(): number;
+        get(index: number): T;
+        set(index: number, element: T): T;
+        add(index: number, element: T): void;
+        remove(index: number): T;
+        indexOf(o: Object): number;
+        lastIndexOf(o: Object): number;
+        listIterator(): ListIterator<T>;
+        listIterator(index: number): ListIterator<T>;
+        subList(fromIndex: number, toIndex: number): List<T>;
+    }
+
+    export interface ListIterator<T> {
+        hasNext(): boolean;
+        next(): T;
+        hasPrevious(): boolean;
+        previous(): T;
+        nextIndex(): number;
+        previousIndex(): number;
+        remove(): void;
+        set(e: T): void;
+        add(e: T): void;
+    }
     declare type Set<T> = globalThis.Set<T>;
     declare type Map<K, V> = globalThis.Map<K, V>;
 }
