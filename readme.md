@@ -7,8 +7,9 @@ npm install -g typescript
 
 从远程仓库中拉取
 ```
-git clone https://github.com/Mcayear/NWeaponRe.git
+git clone --recurse-submodules https://github.com/Mcayear/NWeaponRe.git
 ```
+> 如果你已经`git clone`且并未附带`--recurse-submodules`，可以使用`git submodule update --init`来拉取子模块
 
 前往目录
 ```
