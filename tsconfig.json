@@ -4,6 +4,7 @@
       "module": "es2022",
       "outDir": "./dist/@NWeaponRe",
       "strict": true,
+      "allowJs": true,
       "esModuleInterop": true,
       "noEmitHelpers": true,
       "lib": ["es6", "dom", "ES2022"],
