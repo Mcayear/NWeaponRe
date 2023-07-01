@@ -1,12 +1,37 @@
 import { Player as JPlayer } from "cn.nukkit.Player";
 import { Item as JItem } from "cn.nukkit.item.Item";
-import { FloatTextEntity } from 'cn.vusv.njsutil.FloatTextEntity';
 import { Server } from "cn.nukkit.Server";
 import { Inventory } from "cn.nukkit.inventory.Inventory";
 
 type JEntity = cn.nukkit.entity.Entity;
 type JItem = cn.nukkit.item.Item;
 type JPlayer = cn.nukkit.Player;
+type CommadHandleRes = {
+    action: string;
+    codeName: string;
+    playerName: string;
+    CheckType: string;
+    showId?: string;
+    ItemType: string;
+    ItemName: string;
+    number?: number;
+    runeAction?: string;
+    clear?: 'clear';
+    player: {
+        _PNXEntity: JEntity
+        name: string;
+    };
+    value: string | number;
+    sec: string | number;
+    attrName: string;
+    currentTag: string;
+    newTag: string;
+};
+type CommadHandleOut = {
+    error: (arg0: string) => void;
+    success: (arg0: string) => void;
+    addMessage: (arg0: string) => any;
+}
 
 interface AttrObject {
     [key: string]: number[];
@@ -19,7 +44,7 @@ async function start() {
         getItData, getArmorConfig, getGemConfig, getJewelryConfig, getPaperConfig, getRuneConfig, getWeaponConfig
     } = await import('./util/WeaponConfig.js');
     const { mc, File, ParamType, PermType } = await import('@LLSELib');
-    const { Util: UtilClass } = await import('cn.vusv.njsutil.Util');
+    const { Util: UtilClass } = await import('cn.');
     const Tool = await import('./util/Tool.js');
     const { SetPlayerAttr, GetPlayerAttr } = await import('./improvements/AttrComp.js');
     const { ForgingFakeInvChange } = await import('./improvements/forging/ForgingFakeInvChange.js');
@@ -63,11 +88,11 @@ async function start() {
 
     /**
      * 添加延时任务
-     * @param {number} timestamp 
-     * @param {any} obj 
-     * @returns 
      */
-    function addTimeoutTask(timestamp: number, obj: { func: (uid: string) => void; args: any[]; }) {
+    function addTimeoutTask<T extends any[]>(timestamp: number, obj: {
+        func: (uid: string) => void;
+        args: T;
+    }) {
         while (TaskExecList.has(timestamp)) {
             timestamp++;
         }
@@ -82,7 +107,7 @@ async function start() {
      * @param {Object} res 结果
      * @returns 
      */
-    function NWeaponCommandHandle(_cmd: any, _ori: { type: string | number; player: { _PNXEntity: JEntity; }; }, out: { error: (arg0: string) => void; success: (arg0: string) => void; addMessage: (arg0: string) => any; }, res: { action: string; codeName: string; playerName: string; CheckType: string; showId: string; ItemType: any; ItemName: any; number: any; runeAction: any; clear: any; player: { _PNXEntity: any; name: string; }; value: string | number; sec: string | number; attrName: string; currentTag: any; newTag: any; }) {
+    function NWeaponCommandHandle(_cmd: any, _ori: { type: number; player: { _PNXEntity: JEntity; } }, out: CommadHandleOut, res: CommadHandleRes) {
         if (_ori.type != 0 && _ori.type != 7) {
             console.log("Wrong origin type: " + _ori.type);
             out.error("Wrong origin type: " + _ori.type);
@@ -410,7 +435,7 @@ async function start() {
                 if (!player.isOp()) {
                     return player.sendMessage("[NWeapon] Only OP.");
                 }
-                let item = Tool.onlyNameGetItem(res.ItemType, res.ItemName, res.number, player);
+                let item = Tool.onlyNameGetItem(res.ItemType, res.ItemName, res.number || 1, player);
                 if (!item) return;
                 if (res.action === "give") {
                     if (res.playerName) {
@@ -520,7 +545,7 @@ async function start() {
                     return out.error("[NWeapon] Only OP.");
                 }
                 if (res.clear) {
-                    SetPlayerAttr(res.player._PNXEntity, "Effect", { id: false });
+                    SetPlayerAttr(res.player.name, "Effect", { id: false });
                     out.success("[NWeapon] 已清除 " + res.player.name + " 的所有属性效果");
                     break;
                 }
@@ -530,7 +555,7 @@ async function start() {
                 if (!res.sec) {
                     res.sec = 0;
                 }
-                SetPlayerAttr(res.player._PNXEntity, "Effect", { id: res.attrName, level: res.value, time: res.sec });
+                SetPlayerAttr(res.player.name, "Effect", { id: res.attrName, level: res.value, time: res.sec });
                 if (res.sec) {// res.sec
                     out.success("[NWeapon] 已设置 " + res.player.name + " " + res.attrName + " 属性效果等级为 " + res.value + " 持续时长 " + res.sec + "s");
                 } else {

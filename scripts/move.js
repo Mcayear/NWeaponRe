@@ -23,9 +23,9 @@ async function copyFolder(src, dest) {
 
 async function copyFiles() {
   try {
-    await copyFile('./src/plugin.yml', './dist/@NWeaponRe/plugin.yml');
+    await copyFile('./src/plugin.yml', './dist/@NWeaponRe/src/plugin.yml');
     console.log('plugin.yml copied successfully!');
-    await copyFolder('./src/resource/', './dist/@NWeaponRe/resource/');
+    await copyFolder('./src/resource/', './dist/@NWeaponRe/src/resource/');
     console.log('resource copied successfully!');
   } catch (err) {
     console.error(err);

@@ -1,25 +1,29 @@
 {
-    "compilerOptions": {
-      "target": "es2022",
-      "module": "es2022",
-      "outDir": "./dist/@NWeaponRe",
-      "strict": true,
-      "allowJs": true,
-      "esModuleInterop": true,
-      "noEmitHelpers": true,
-      "lib": ["es6", "dom", "ES2022"],
-      "paths": {
-        "@LLSELib": ["./libs/LLSELib/@LLSELib/index.js"],
-        "@LLSELib/*": ["./libs/LLSELib/@LLSELib/*"]
-      }
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "es2022",
+    "outDir": "./dist/@NWeaponRe",
+    "strict": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "noEmitHelpers": true,
+    "lib": ["es6", "dom", "ES2022"],
+    "paths": {
+      "@LLSELib": ["./libs/LLSELib/@LLSELib/index.js"],
+      "@LLSELib/*": ["./libs/LLSELib/@LLSELib/*"]
     },
-    "scripts": {
-      "comp": "tsc && npm run scripts/moveYaml.js",
-    },
-    "baseUrl": "./",
-    "include": [
-        "./src/**/*",
-        "./libs/**/*.d.ts"
-    ]
-  }
-  
+    "baseUrl": "./"
+  },
+  "scripts": {
+    "comp": "tsc && npm run scripts/move.js"
+  },
+  "include": [
+    "./src/**/*",
+    "./libs/**/*.d.ts"
+  ],
+  "exclude": [
+    "./libs/LLSELib",
+    "**/*.js",
+    "./libs/LLSELib/**/*.js"
+  ]
+}

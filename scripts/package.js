@@ -15,7 +15,7 @@ async function zipFolder() {
       throw err;
     });
     archive.pipe(output);
-    archive.directory('./dist/@NWeaponRe', false);
+    archive.directory('./dist/@NWeaponRe/src', false);
     await archive.finalize();
   } catch (err) {
     console.error(err);
