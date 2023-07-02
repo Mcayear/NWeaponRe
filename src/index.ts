@@ -44,7 +44,7 @@ async function start() {
         getItData, getArmorConfig, getGemConfig, getJewelryConfig, getPaperConfig, getRuneConfig, getWeaponConfig
     } = await import('./util/WeaponConfig.js');
     const { mc, File, ParamType, PermType } = await import('@LLSELib');
-    const { Util: UtilClass } = await import('cn.');
+    const { Util: UtilClass } = await import('cn.vusv.njsutil.Util');
     const Tool = await import('./util/Tool.js');
     const { SetPlayerAttr, GetPlayerAttr } = await import('./improvements/AttrComp.js');
     const { ForgingFakeInvChange } = await import('./improvements/forging/ForgingFakeInvChange.js');

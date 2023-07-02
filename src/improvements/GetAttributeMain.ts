@@ -1,6 +1,6 @@
 import * as inventory from '../util/inventory.js';
 import * as blockitem from '../util/blockitem.js';
-import { getNWeaponConfig, itemBindPlayer, NWeaponItemConfigType, onlyNameGetItem } from '../util/Tool.js';
+import { getNWeaponConfig, itemBindPlayer, ItemConfigType, onlyNameGetItem } from '../util/Tool.js';
 import { SetPlayerAttr, GetPlayerAttr } from './AttrComp.js';
 import { ForgingAttrNbtType } from './forging/ForgingFakeInvClose.js';
 
@@ -34,7 +34,7 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
     if (!inv) return {};
     let SlotList = [player.getInventory().getHeldItemIndex(), 36, 37, 38, 39];
     var effectSuit: {[key: string]: number} = {};
-    let EquipAttrCore = function (item: JItem, attrList: NWeaponItemConfigType) {
+    let EquipAttrCore = function (item: JItem, attrList: ItemConfigType) {
         let suitName = attrList.套装;
         if (suitName) {
             if (effectSuit[suitName]) {
@@ -68,7 +68,7 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
             }
         }
         let gemListTag = item.getNamedTag().getString('GemList');
-        if (!gemListTag) {// 宝石属性解析
+        if (gemListTag != "") {// 宝石属性解析
             let gemList: GemNBTType = JSON.parse(gemListTag);
             for (var i = 0; i < gemList.inlay.length; i++) {
                 let GemData = _C.GemConfig[gemList.inlay[i]];
@@ -86,7 +86,7 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
             }
         }
         let seikoTag = item.getNamedTag().getString('Seiko');
-        if (!seikoTag) {// 精工属性解析
+        if (seikoTag != "") {// 精工属性解析
             let seiko: SeikoNBTType = JSON.parse(seikoTag);
             let type = attrList.类型 == "武器" ? 0 : 1;
             let attrdata = _C.MainConfig.Seiko.attr[type][seiko.level - 1];
@@ -114,8 +114,7 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
             }
         }
         let runeBore = item.getNamedTag().getList('runeBore');
-        let hasRune = item.getNamedTag().contains('runeBore');
-        if (hasRune) {// 符文属性解析
+        if (item.getNamedTag().contains('runeBore')) {// 符文属性解析
             for (let i = 0; i < runeBore.size(); i++) {
                 const str = runeBore.get(i).parseValue() as unknown as string;// 存储的 符文名（文件名）
                 if (!str.length) {
@@ -125,10 +124,13 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
                 if (rune) {
                     let attrdata = rune.属性;// 通过文件名获取符文符号
                     for (let key in attrdata) {
-                        let attr = attrdata[key];
-                        if (typeof (attr) === "string") {
-                            const arr = attr.split("-");
+                        let attrValue = attrdata[key];
+                        let attr: number|[number, number];
+                        if (typeof (attrValue) === "string") {
+                            const arr = attrValue.split("-");
                             attr = [Number(arr[0]), Number(arr[1])];
+                        } else {
+                            attr = attrValue;
                         }
                         result[key] = MergeAttrValue(result[key], attr);
                     }

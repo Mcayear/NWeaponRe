@@ -45,6 +45,9 @@ export interface ItemConfigType {
     符文?: string;
     符文类型?: string;
     类别?: string;
+    套装?: string;
+    定制者?: string;
+    生效槽?: number[];
 
     直升?: number;
     幸运?: number;// float
