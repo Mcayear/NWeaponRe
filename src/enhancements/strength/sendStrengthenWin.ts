@@ -1,9 +1,11 @@
 import { Player as JPlayer } from 'cn.nukkit.Player';
 import { Inventory } from "cn.nukkit.inventory.Inventory";
+import { FakeInvName } from '../../enum/FakeInvEnum.js';
 const blockitem = await import("../../util/blockitem.js");
 const { inventory } = await import("cn.vusv.njsutil.inventory");
 
 type JPlayer = cn.nukkit.Player;
+
 /**
  * 
  * @param {JPlayer} player 
@@ -21,7 +23,7 @@ export function sendStrengthenWin(player: JPlayer) {
     hopperInv.push(temp2);
     hopperInv.push(temp2);
     hopperInv.push(temp2);
-    player.addWindow(new inventory().addInv(false, Java.to(hopperInv, "cn.nukkit.item.Item[]"), "强化", function(event: com.nukkitx.fakeinventories.inventory.FakeSlotChangeEvent){ 
+    player.addWindow(new inventory().addInv(false, Java.to(hopperInv, "cn.nukkit.item.Item[]"), FakeInvName.Strangth+"强化", function(event: com.nukkitx.fakeinventories.inventory.FakeSlotChangeEvent){ 
         var slot: number = event.getAction().getSlot();
         if (slot != 0) {
             return event.setCancelled(true);

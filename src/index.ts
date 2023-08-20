@@ -2,6 +2,7 @@ import { Player as JPlayer } from "cn.nukkit.Player";
 import { Item as JItem } from "cn.nukkit.item.Item";
 import { Server } from "cn.nukkit.Server";
 import { Inventory } from "cn.nukkit.inventory.Inventory";
+import { FakeInvName } from './enum/FakeInvEnum.js';
 
 type JEntity = cn.nukkit.entity.Entity;
 type JItem = cn.nukkit.item.Item;
@@ -268,7 +269,7 @@ async function start() {
                 break;
             }
             case "dz": {
-                sender.addWindow(new inventory().addInv(false, Java.to([], "cn.nukkit.item.Item[]"), "锻造", ForgingFakeInvChange) as unknown as Inventory);
+                sender.addWindow(new inventory().addInv(false, Java.to([], "cn.nukkit.item.Item[]"), FakeInvName.Forging+"锻造", ForgingFakeInvChange) as unknown as Inventory);
                 break;
             }
             case "seiko": {

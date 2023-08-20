@@ -2,7 +2,6 @@ import * as blockitem from '../../util/blockitem.js';
 import * as Tool from '../../util/Tool.js';
 import { FakeInvName } from '../../enum/FakeInvEnum.js';
 import { Equipment } from '../../interface/ItemConfig.js';
-import { File } from '@LLSELib';
 
 type JInventory = cn.nukkit.inventory.Inventory;
 type JPlayer = cn.nukkit.Player;
@@ -19,7 +18,7 @@ closeEventMap.set(FakeInvName.Strangth, StrengthFakeInvClose);
 export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInventory) {
     let _C = contain('NWeapon_C');
     let HandItem = inv.getItem(0);
-    if (HandItem.getId() === 0) {
+    if (HandItem.getId() === 0) {                                                
         return;
     }
     let backItem = function (msg: string) {

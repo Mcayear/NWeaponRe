@@ -2,6 +2,7 @@ import * as blockitem from '../../util/blockitem.js';
 import * as Tool from '../../util/Tool.js';
 import { getNWeaponConfig } from '../../util/Tool.js';
 
+
 /** 锻造 - 虚拟物品栏物品更改事件处理 */
 export function ForgingFakeInvChange(event: com.nukkitx.fakeinventories.inventory.FakeSlotChangeEvent) {
     var player = event.getPlayer();
