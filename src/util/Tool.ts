@@ -4,11 +4,12 @@ import * as blockitem from "./blockitem.js";
 import { File } from '@LLSELib';
 import { Player as JPlayer } from 'cn.nukkit.Player';
 import { Entity as JEntity } from "cn.nukkit.entity.Entity";
-import { Inventory } from "cn.nukkit.inventory.Inventory";
 
 type JPlayer = cn.nukkit.Player;
 type JEntity = cn.nukkit.entity.Entity;
 type JItem = cn.nukkit.item.Item;
+type PlayerInventory = cn.nukkit.inventory.PlayerInventory;
+type JInventory = cn.nukkit.inventory.Inventory;
 
 const Util = new UtilClass();
 
@@ -682,7 +683,8 @@ export function itemBindPlayer(item: JItem, player: JPlayer, noTips: boolean, on
 }
 
 
-export function examineNeed(needArray: string[], inv: Inventory, isCheck: boolean):[false, string | null]|[true, Inventory| null];
+export function examineNeed(needArray: string[], inv: PlayerInventory | JInventory, isCheck: boolean, player: JPlayer): [boolean];
+export function examineNeed(needArray: string[], inv: PlayerInventory | JInventory, isCheck: boolean): [false, string | null]|[true, JInventory | null];
 /**
  * 检查并扣除需求，输入Array 输出Boolean
  * @param needArray {string[]} 需求数组
@@ -693,7 +695,7 @@ export function examineNeed(needArray: string[], inv: Inventory, isCheck: boolea
  * @example
  *   examineNeed(["item@1:0:64", "mi@1:宝石碎片", "money@10000"], player.getInventory(), true, player);
  */
-export function examineNeed(needArray: string[], inv: Inventory, isCheck: boolean, player?: JPlayer):[false, string | null]|[true, Inventory | null] {
+export function examineNeed(needArray: string[], inv: PlayerInventory | JInventory, isCheck: boolean, player?: JPlayer): [false, string | null] | [true, JInventory | null] | [boolean] {
     const MagicItem = contain("NWeapon_MagicItem");
     const _C = contain("_C");
     let itemNeedList: string[] = [];
@@ -793,7 +795,7 @@ export function examineNeed(needArray: string[], inv: Inventory, isCheck: boolea
     if (player) {
         player.getInventory().setContents(inv.getContents());
     }
-    return [true, inv];
+    return [true, inv as unknown as JInventory];
 }
 /**
  * 在数组中按概率随机选择指定数量个

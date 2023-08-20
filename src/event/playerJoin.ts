@@ -5,6 +5,7 @@ import { SetPlayerAttr } from '../improvements/AttrComp.js';
 const _C = contain('NWeapon_C');
 pnx.listenEvent("cn.nukkit.event.player.PlayerLocallyInitializedEvent", EventPriority.NORMAL, event => {
 	let name = event.getPlayer().getName();
+	let seikoFailedNum = contain('seikoFailedNum');
 	seikoFailedNum[name] = 0;
 	SetPlayerAttr(name, "装备武器", {});
 	if (_C.MainConfig.defaultAttr) {

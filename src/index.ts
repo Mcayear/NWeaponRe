@@ -74,6 +74,13 @@ async function start() {
         exposeObject('PlayerSmithingTempData', new Map());
     }
 
+    /**
+     * hook 虚拟物品栏关闭事件
+     */
+    if (!contain('FakeInvCloseEventHook')) {// 防止重复 FakeInvCloseEventHook
+        exposeObject('FakeInvCloseEventHook', new Map());
+    }
+
     // 仅存储在内存的数据
     var ShowObj = new Map<string, any>();
     var PlayerShowCount = new Map<string, number>();
@@ -620,7 +627,7 @@ async function start() {
         cmd.setEnum("LockAction", ["lock", "unlock"]);// 上锁手持装备(不会被分解) / 解锁
 
         cmd.setEnum("RuneAction", ["rune"]);// 符文
-        cmd.setEnum("RuneNextAction", ["inlay", "take"]);// 镶嵌符文 / 拆卸符文
+        cmd.setEnum("RuneNextAction", ["inlay", "take", "锻造图"]);// 镶嵌符文 / 拆卸符文
         cmd.setEnum("RuneBoreAction", ["bore"]);// 为玩家手中装备打符文孔
         cmd.setEnum("UpgradeAction", ["upgrade"]);// 打开一个转换炉用于升级/更新装备
         cmd.setEnum("EffectAction", ["effect"]);// 打开一个转换炉用于升级/更新装备
