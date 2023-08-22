@@ -1,24 +1,31 @@
 import * as blockitem from '../../util/blockitem.js';
 import * as Tool from '../../util/Tool.js';
 import { FakeInvName } from '../../enum/FakeInvEnum.js';
-import { Equipment } from '../../interface/ItemConfig.js';
+import { EquipmentType, ForgingAttrType, _CType } from '../../interface/ConfigType.js';
+import { EquipmentEntryType } from '../../interface/ForgeEntryType.js';
+
+import { Server } from "cn.nukkit.Server";
 
 type JInventory = cn.nukkit.inventory.Inventory;
 type JPlayer = cn.nukkit.Player;
 type JItem = cn.nukkit.item.Item;
 
+const server = Server.getInstance();
 let closeEventMap = contain('FakeInvCloseEventHook');
 closeEventMap.set(FakeInvName.Strangth, StrengthFakeInvClose);
+
+let _C: _CType = contain('NWeapon_C');
+
+const { mc } = await import('@LLSELib');
 
 /**
  * 强化 - 虚拟物品栏关闭事件处理
  * @param {any} event 
  * @returns 
  */
-export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInventory) {
-    let _C = contain('NWeapon_C');
+export function StrengthFakeInvClose(event: any, player: JPlayer, inv: JInventory) {
     let HandItem = inv.getItem(0);
-    if (HandItem.getId() === 0) {                                                
+    if (HandItem.getId() === 0) {
         return;
     }
     let backItem = function (msg: string) {
@@ -82,11 +89,12 @@ export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInvento
             break;
         default:
             {
+                let strengthFailedNum: Map<string, number> = contain('strengthFailedNum');
                 if (!Tool.examineNeed(_C.MainConfig.Strengthen.need[nbtObj.level].split("||"), player.getInventory(), false, player)[0]) {
                     return backItem("");
                 }
                 let oldLore = blockitem.getItemLore(HandItem),
-                    probability = _C.MainConfig.Strengthen.chance[nbtObj.level] + Tool.defineData(strengthFailedNum[player.name]) * _C.MainConfig.Strengthen.failedAddition,
+                    probability = _C.MainConfig.Strengthen.chance[nbtObj.level] + Tool.defineData(strengthFailedNum.get(player.getName())) * _C.MainConfig.Strengthen.failedAddition,
                     failProtect = 0,
                     straightUp = 0,
                     luck = false;
@@ -94,12 +102,12 @@ export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInvento
                 for (var i = 0; i < 9; i++) {
                     let item = bagitems.getItem(i);
                     if (item.getCustomName() && item.getNamedTag().getString('NWeaponNameTag')) {
-                        let arr = item.getNamedTag().getString('NWeaponNameTag').split(";");
-                        if (arr[0] === ItemTypeList["强化石"]) {
+                        let arr: string[] = item.getNamedTag().getString('NWeaponNameTag').split(";");
+                        if (arr[0] === _C.ItemTypeList["强化石"]) {
                             let count = 1;
-                            luck_ = item.getNamedTag().getString('Luck') || 0;
-                            failProtect_ = item.getNamedTag().getString('FailProtect') || 0;
-                            straightUp_ = item.getNamedTag().getString('StraightUp') || 0;
+                            let luck_ = item.getNamedTag().contains('Luck') ? Number(item.getNamedTag().getString('Luck')) : 0;
+                            let failProtect_ = item.getNamedTag().contains('FailProtect') ? Number(item.getNamedTag().getString('FailProtect')) : 0;
+                            let straightUp_ = item.getNamedTag().contains('StraightUp') ? Number(item.getNamedTag().getString('StraightUp')) : 0;
                             if (straightUp && straightUp_) {
                                 continue;
                             }
@@ -129,7 +137,7 @@ export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInvento
                             }
                             failProtect = !isNaN(failProtect_) ? Number(failProtect_) : 0;
                             item.setCount(count);
-                            blockitem.removeItemToPlayer(player, item);
+                            blockitem.removeItemFromPlayer(player, item);
                             player.sendMessage("[NWeapon] §7你消耗了 " + item.getCustomName() + "§r§7 *" + count);
                         }
                     }
@@ -148,9 +156,9 @@ export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInvento
                     if (_C.MainConfig.Strengthen.broadcastMessage && nbtObj.level >= _C.MainConfig.Strengthen.broadcastMessage[0]) {
                         server.broadcastMessage(_C.MainConfig.Strengthen.broadcastMessage[1].replace("%p", player.getName()).replace("%lv", nbtObj.level).replace("%weapon", HandItemName));
                     } else {
-                        logger.info(player.name + "淬炼 " + HandItemName + " §r至 " + nbtObj.level + " 级");
+                        console.info(player.getName() + "淬炼 " + HandItemName + " §r至 " + nbtObj.level + " 级");
                     }
-                    strengthFailedNum[player.name] = 0;
+                    strengthFailedNum.set(player.getName(), 0);
                     player.sendTitle("§a§l+ 淬炼成功 +", "§e" + nbtObj.level + "级 §6" + getGradeSymbol.strengthen(nbtObj.level));
                     blockitem.setItemLore(HandItem, oldLore);
                     HandItem.setNamedTag(HandItem.getNamedTag().putString('Strengthen', JSON.stringify(nbtObj)));
@@ -175,7 +183,7 @@ export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInvento
                                 res = 1;
                             }
                             player.sendTitle("§c§l- 淬炼失败 -", "§4下降" + (nbtObj.level - res) + "级 §6" + getGradeSymbol.strengthen(res));
-                            seikoFailedNum[player.getName()]++;
+                            strengthFailedNum.set(player.getName(), (strengthFailedNum.get(player.getName()) || 0) + 1);
                             nbtObj.level = res;
                             oldLore = oldLore.replace(/§r§7§l======【 §c强化§7 】======;§r§fLv§e\. .+ §r/, "§r§7§l======【 §c强化§7 】======;§r§fLv§e. " + getGradeSymbol.strengthen(res) + " §r");
                             blockitem.setItemLore(HandItem, oldLore);
@@ -188,13 +196,12 @@ export function StrengthFakeInvClose (event: any, player: JPlayer, inv: JInvento
     }
 }
 
-let _C = contain('NWeapon_C');
 const getGradeSymbol = {
     seiko: function (level: number) {
         let str = "";
         let loop = function (lv: number) {
             for (let i = 0; i < _C.MainConfig.GradeSymbol.list[0].length; i++) {
-                let v = _C.MainConfig.GradeSymbol.list[0][i];
+                let v = Number(_C.MainConfig.GradeSymbol.list[0][i]);
                 if (lv >= v) {
                     str += _C.MainConfig.GradeSymbol.list[1][i];
                     return loop(lv - v);
@@ -217,67 +224,75 @@ const getGradeSymbol = {
  * @param forgingAttr {Object} 通过读取nbt获得的对象
  * @param player {?Player} 玩家对象，用于发送属性更改信息
  */
-function entryConfigToUpdate(item:JItem, itemConfig: Equipment, forgingAttr, playe: JPlayer) {
+function entryConfigToUpdate(item: JItem, itemConfig: EquipmentType, forgingAttr: ForgingAttrType, player: JPlayer) {
     let nbtStr = item.getNamedTag().getString('Strengthen');
     let nbtObj;
     if (nbtStr.length) {
         nbtObj = JSON.parse(nbtStr);
-        if (nbtObj.level >= ForgeEntry.Config.maxLevel) {
+        if (nbtObj.level >= _C.ForgeEntry.Config.maxLevel) {
             return null;
         }
     }
-	const content = [item.getNamedTag().getString('NWeaponNameTag').split(';')[1]+" §r§l+"+(nbtObj.level+1), "\n§r# 升级 #"];
+    const content = [item.getNamedTag().getString('NWeaponNameTag').split(';')[1] + " §r§l+" + (nbtObj.level + 1), "\n§r# 升级 #"];
     const AttrLore = [];
+    if (!itemConfig.锻造词条) {
+        return;
+    }
     // 主词条
-    var arr1 = Tool.cloneObjectFn(ForgeEntry[itemConfig.锻造词条].mainEntry.list);
-    var arr2 = Tool.cloneObjectFn(ForgeEntry[itemConfig.锻造词条].mainEntry.p);
-    var addList = Tool.cloneObjectFn(ForgeEntry[itemConfig.锻造词条].mainEntry.add);
+    let mainEntry = (_C.ForgeEntry[itemConfig.锻造词条] as EquipmentEntryType).mainEntry;
+    var arr1: string[] = Tool.cloneObjectFn(mainEntry.list);
+    var arr2: number[] = Tool.cloneObjectFn(mainEntry.p);
+    var addList: number[] = Tool.cloneObjectFn(mainEntry.add || []);
     var arr3 = Object.keys(forgingAttr.mAttr);
     var temp = minusArray(arr1, arr3);
     temp.forEach((tempV) => {// 开始重新分配概率
         let index = arr1.indexOf(tempV);
         arr1.splice(index, 1);
         addList.splice(index, 1);// 这是每个属性每级的增长值
-        let p = arr2.splice(index, 1);
+        let p = arr2.splice(index, 1)[0];
         let add = p / arr2.length;
         arr2.forEach(function (v, arr2i) {
             arr2[arr2i] = v + add;
         });
     });
     let arrIndex = Tool.getArrayProbabilisticResults(arr2);
-	let oldMAttr = Tool.cloneObjectFn(forgingAttr.mAttr);
+    let oldMAttr = Tool.cloneObjectFn(forgingAttr.mAttr);
     forgingAttr.mAttr[arr1[arrIndex]] = MergeAttrValue(forgingAttr.mAttr[arr1[arrIndex]], addList[arrIndex]);
     for (let key in forgingAttr.mAttr) {
-        AttrLore.push("§r§a□ " + key + ":§d " + Tool.valueToString(forgingAttr.mAttr[key], key));
-		content.push("§r□ " + key + ":§f " + Tool.valueToString(oldMAttr[key], key) + " -> §6" + Tool.valueToString(forgingAttr.mAttr[key], key)+"§a ▲");
+        AttrLore.push("§r§a□ " + key + ":§d " + Tool.valueToString(forgingAttr.mAttr[key] as number[], key));
+        content.push("§r□ " + key + ":§f " + Tool.valueToString(oldMAttr[key] as number[], key) + " -> §6" + Tool.valueToString(forgingAttr.mAttr[key] as number[], key) + "§a ▲");
     }
     nbtObj.level++;
     item.setNamedTag(item.getNamedTag().putString('Strengthen', JSON.stringify(nbtObj)));
+    arr1 = [];
+    arr2 = [];
+    addList = [];
     // 次词条
-    let attrMainEntryConfig = itemConfig.锻造属性主词条 || itemConfig.锻造属性;
-    var arr1 = Tool.cloneObjectFn(ForgeEntry[itemConfig.锻造词条].ubEntry.list);
-    var arr2 = Tool.cloneObjectFn(ForgeEntry[itemConfig.锻造词条].ubEntry.p);
-    var addList = Tool.cloneObjectFn(ForgeEntry[itemConfig.锻造词条].ubEntry.add);
+    let ubEntry = (_C.ForgeEntry[itemConfig.锻造词条] as EquipmentEntryType).mainEntry;
+    var arr1: string[] = Tool.cloneObjectFn(ubEntry.list);
+    var arr2: number[] = Tool.cloneObjectFn(ubEntry.p);
+    var addList: number[] = Tool.cloneObjectFn(ubEntry.add || []);
+    let attrMainEntryConfig = itemConfig.锻造属性主词条 || itemConfig.锻造属性 || {};
     var arr3 = Object.keys(forgingAttr.attr);
-    if (!(nbtObj.level % (ForgeEntry.Config.ubEntry.Update || 3))) {// 判断是否升级次词条
-        if (arr3.length < ForgeEntry.Config.ubEntry.MaxCount) {
+    if (!(nbtObj.level % (_C.ForgeEntry.Config.ubEntry.Update || 3))) {// 判断是否升级次词条
+        if (arr3.length < _C.ForgeEntry.Config.ubEntry.MaxCount) {
             // 判断是否新增次词条
             let canAddEntry = minusArray(Object.keys(attrMainEntryConfig), arr3);
             if (canAddEntry.length) {
                 // 因为是新增，所以需要乘锻造品质的系数
-                let getForgingAttr = function (value) {
+                let getForgingAttr = function (value: number) {
                     let ForgingAttrNbt = JSON.parse(item.getNamedTag().getString('forging'));
                     let index = ForgingAttrNbt.quality;
-                    let arr = [Config.锻造[2][index]];
+                    let arr = [_C.MainConfig.锻造[2][index]];
                     if (typeof (arr[0]) === "string") {
                         arr = arr[0].split("-");
                     }
-                    return Math.round((value * 1000) * getRandomNum(arr)) / 1000;
+                    return Math.round((value * 1000) * Tool.getRandomNum(arr as number[])) / 1000;
                 }
                 minusArray(arr1, canAddEntry).forEach((tempV) => {// 开始重新分配概率
                     let index = arr1.indexOf(tempV);
                     arr1.splice(index, 1);
-                    let p = arr2.splice(index, 1);
+                    let p = arr2.splice(index, 1)[0];
                     let add = p / arr2.length;
                     arr2.forEach(function (v, arr2i) {
                         arr2[arr2i] = v + add;
@@ -288,11 +303,11 @@ function entryConfigToUpdate(item:JItem, itemConfig: Equipment, forgingAttr, pla
                 let key = arr1[arrIndex];
                 if (typeof (mainAttrValue) === 'string') {
                     let arr = mainAttrValue.split("-");
-                    forgingAttr.attr[key] = [getForgingAttr(arr[0]), getForgingAttr(arr[1])];
+                    forgingAttr.attr[key] = [getForgingAttr(Number(arr[0])), getForgingAttr(Number(arr[1]))];
                 } else {
                     forgingAttr.attr[key] = [getForgingAttr(mainAttrValue)];
                 }
-				content.push("§r§l§6  " + key + ": " + Tool.valueToString(forgingAttr.attr[key], key));
+                content.push("§r§l§6  " + key + ": " + Tool.valueToString(forgingAttr.attr[key] as number[], key));
             }
         } else {
             // 提升次词条属性
@@ -300,32 +315,81 @@ function entryConfigToUpdate(item:JItem, itemConfig: Equipment, forgingAttr, pla
                 let index = arr1.indexOf(tempV);
                 arr1.splice(index, 1);
                 addList.splice(index, 1);// 这是每个属性每级的增长值
-                let p = arr2.splice(index, 1);
+                let p = arr2.splice(index, 1)[0];
                 let add = p / arr2.length;
                 arr2.forEach(function (v, arr2i) {
                     arr2[arr2i] = v + add;
                 });
             });
             let arrIndex = Tool.getArrayProbabilisticResults(arr2);
-			let key = arr1[arrIndex];
-			let oldAttr = Tool.cloneObjectFn(forgingAttr.attr[key]);
+            let key = arr1[arrIndex];
+            let oldAttr = Tool.cloneObjectFn(forgingAttr.attr[key]);
             forgingAttr.attr[key] = MergeAttrValue(forgingAttr.attr[key], addList[arrIndex]);
-			content.push("§r  " + key + ":§f " + Tool.valueToString(oldAttr, key) + " -> §6" + Tool.valueToString(forgingAttr.attr[key], key)+"§a ▲");
+            content.push("§r  " + key + ":§f " + Tool.valueToString(oldAttr as number[], key) + " -> §6" + Tool.valueToString(forgingAttr.attr[key] as number[], key) + "§a ▲");
         }
     }
     for (let key in forgingAttr.attr) {
-        AttrLore.push("§r§a" + key + ":§d " + Tool.valueToString(forgingAttr.attr[key], key));
+        AttrLore.push("§r§a" + key + ":§d " + Tool.valueToString(forgingAttr.attr[key] as number[], key));
     }
     const LoreList = ["§r§2锻造属性:",
         AttrLore.join(";"),
         "§r§4§l一一一"];
     item.getNamedTag().putString('forging', JSON.stringify(forgingAttr));
     blockitem.setItemLore(item, blockitem.getItemLore(item).replace(/§r§2锻造属性.+?§r§4§l一一一/, LoreList.join(";")));
-	if (player) {
-		window.getSimpleWindowBuilder('§e词条属性更新', content.join('\n')).show(player);
-	}
+    if (player) {
+        let winx = mc.newSimpleForm();
+        winx.setTitle("§e词条属性更新");
+        winx.setContent(content.join("\n"));
+        mc.getPlayer(player.getName())!.sendForm(winx, ()=>{});
+    }
     return item;
 }
+
+/**
+ * 合并属性的值
+ * @param obj {Array|number} 原属性的值
+ * @param value {Array|number} 配置中属性的值
+ * @param forging {?number} 锻造强度
+ * @returns {Array} 返回数组 [min, max]
+ */
+function MergeAttrValue(
+    obj: number[] | number | string,
+    value: number[] | number | string,
+    forging?: number
+  ): number[] | number {
+    if (!forging) {
+      forging = 1;
+    }
+    if (!obj) {
+      if (typeof value === "object") {
+        obj = [0, 0];
+      } else {
+        obj = 0;
+      }
+    }
+  
+    if (typeof value === "string") {
+      // "1-100"
+      let arr = (value as string).split("-");
+      value = [Number(arr[0]), Number(arr[1])];
+    }
+    if (Array.isArray(value)) {
+      if (typeof obj !== "object") {
+        obj = [Number(obj), Number(obj)];
+      }
+      obj[0] += Number(Number(value[0] * forging).toFixed(4));
+      obj[1] += Number(Number(value[1] * forging).toFixed(4));
+    } else if (Array.isArray(obj)) {
+      if (obj.length === 1) {
+        obj[1] = obj[0];
+      }
+      obj[0] += Number(Number(value as number * forging).toFixed(4));
+      obj[1] += Number(Number(value as number * forging).toFixed(4));
+    } else {
+      obj = Number(obj) + Number(value as number * forging);
+    }
+    return obj;
+  }
 
 /**
  * 获取arr1中不存在于arr2数组内的元素

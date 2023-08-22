@@ -448,6 +448,7 @@ export function valueToString(data: number[], i?: string): string {
 
 
 export function getArrayProbabilisticResults(array: number[]): number;
+export function getArrayProbabilisticResults(array: number[], index: number): number;
 /**
  * 获取数组概率结果，传入总和为1的数组返回选中概率的下标(下标从0开始)
  * @param {number[]} array 数组

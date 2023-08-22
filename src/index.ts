@@ -587,7 +587,6 @@ async function start() {
                         }
                     }
                     if (data) {
-                        
                         handItem.getNamedTag().putString('NWeaponNameTag', _C.ItemTypeList[data.类型 as keyof typeof _C.ItemTypeList] + ";" + handItemName);
                         handItem.setNamedTag(handItem.getNamedTag());
                         blockitem.setItemInHand(sender, handItem);

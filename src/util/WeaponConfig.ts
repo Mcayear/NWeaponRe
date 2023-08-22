@@ -49,18 +49,6 @@ if (File.exists("./plugins/NWeapon/Config.yml")) {
     MainConfig = JSON.parse(Util.YAMLtoJSON(File.readFrom("./plugins/NWeapon/Config.yml") as string));
 }
 
-const ItemTypeList = {
-    "武器": "Weapon",
-    "护甲": "Armor",
-    "饰品": "Jewelry",
-    "宝石": "Gem",
-    "图纸": "Paper",
-    "符文": "Rune",
-    "锻造石": "FStone",// Forging Stone
-    "精工石": "SeikoStone",// Seiko Stone
-    "宝石券": "GemTicket",// Gem Inlay Ticket
-    "强化石": "Strengthen"// Strengthen Stone
-};
 // 配置文件校验
 if (MainConfig.version != version) {
     MainConfig.AttrDisplayPercent = ["暴击倍率", "吸血倍率", "护甲强度", "反伤倍率", "经验加成", "暴击率", "吸血率", "破防率", "反伤率", "闪避率", "暴击抵抗", "吸血抵抗", "命中率", "伤害加成", "攻击加成", "防御加成", "生命加成"];
@@ -375,7 +363,18 @@ export const getGradeSymbol = {
  * 配置文件对象
  */
 export var _C = {
-    ItemTypeList,
+    ItemTypeList:  {
+        "武器": "Weapon",
+        "护甲": "Armor",
+        "饰品": "Jewelry",
+        "宝石": "Gem",
+        "图纸": "Paper",
+        "符文": "Rune",
+        "锻造石": "FStone",// Forging Stone
+        "精工石": "SeikoStone",// Seiko Stone
+        "宝石券": "GemTicket",// Gem Inlay Ticket
+        "强化石": "Strengthen"// Strengthen Stone
+    },
     MainConfig,
 
     PlayerData,
