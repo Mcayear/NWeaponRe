@@ -1,20 +1,22 @@
 import * as blockitem from '../../util/blockitem.js';
 import * as Tool from '../../util/Tool.js';
 import { PaperConfigType, ItemConfigType } from '../../util/Tool.js';
+import { FakeInvName } from '../../enum/FakeInvEnum.js';
 import { File } from '@LLSELib';
 
 type JPlayer = cn.nukkit.Player;
 type JItem = cn.nukkit.item.Item;
+type JInventory = cn.nukkit.inventory.Inventory;
+
+let closeEventMap = contain('FakeInvCloseEventHook');
+closeEventMap.set(FakeInvName.Forging, ForgingFakeInvClose);
 
 /**
  * 锻造 - 虚拟物品栏关闭事件处理
  * @param {any} event 
  * @returns 
  */
-export function ForgingFakeInvClose (event: com.nukkitx.fakeinventories.inventory.FakeSlotChangeEvent) {
-    var player = event.getPlayer();
-    let inv = event.getAction().getInventory();
-
+export function ForgingFakeInvClose(event: any, player: JPlayer, inv: JInventory) {
     let drawing = inv.getItem(0);
     let itemData: ItemConfigType, weapon: JItem;
     if (drawing.getId() === 0) {

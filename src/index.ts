@@ -55,7 +55,7 @@ async function start() {
     const { sendStrengthenWin } = await import('./enhancements/strength/sendStrengthenWin.js');
     const { toPerformedRuneWeapon } = await import('./improvements/rune/toPerformedRuneWeapon.js');
     const { sendRuneInlayWin } = await import('./enhancements/rune/sendRuneInlayWin.js');
-    
+
 
     const blockitem = await import("./util/blockitem.js");
     const { inventory } = await import("cn.vusv.njsutil.inventory");
@@ -79,13 +79,13 @@ async function start() {
      * hook 虚拟物品栏关闭事件
      */
     if (!contain('FakeInvCloseEventHook')) {// 防止重复 FakeInvCloseEventHook
-        exposeObject('FakeInvCloseEventHook', new Map());
+        exposeObject('FakeInvCloseEventHook', new Map<string, any>());
     }
 
     // 仅存储在内存的数据
     var ShowObj = new Map<string, any>();
     var PlayerShowCount = new Map<string, number>();
-    
+
     if (!contain('seikoFailedNum')) {// 精工失败次数 记录
         exposeObject('seikoFailedNum', new Map<string, number>());
     }
@@ -269,7 +269,7 @@ async function start() {
                 break;
             }
             case "dz": {
-                sender.addWindow(new inventory().addInv(false, Java.to([], "cn.nukkit.item.Item[]"), FakeInvName.Forging+"锻造", ForgingFakeInvChange) as unknown as Inventory);
+                sender.addWindow(new inventory().addInv(false, Java.to([], "cn.nukkit.item.Item[]"), FakeInvName.Forging + "锻造", ForgingFakeInvChange) as unknown as Inventory);
                 break;
             }
             case "seiko": {
@@ -306,7 +306,7 @@ async function start() {
                     }
                     if (data.forging) {
                         win.addLabel("# §a锻造数据§r #");
-                        let attr:AttrObject = data.forging.attr;
+                        let attr: AttrObject = data.forging.attr;
                         let str = "";
                         for (let i in attr) {
                             str += "\n  " + i + ": " + Tool.valueToString(attr[i], i);
@@ -316,7 +316,7 @@ async function start() {
                     if (data.seikoinfo) {
                         let type = _C.WeaponConfig[data.name] || _C.ArmorConfig[data.name], str = "";;
                         type = type.类型 == "武器" ? 0 : 1;
-                        let attr:AttrObject = _C.MainConfig.Seiko.attr[type][data.seikoinfo.level - 1];
+                        let attr: AttrObject = _C.MainConfig.Seiko.attr[type][data.seikoinfo.level - 1];
                         for (let i in attr) {
                             str += "\n  " + i + ": " + Tool.valueToString(attr[i], i);
                         }
@@ -326,7 +326,7 @@ async function start() {
                         if (_C.MainConfig.Strengthen.model != 2) {
                             let type = _C.WeaponConfig[data.name] || _C.ArmorConfig[data.name], str = "";;
                             type = type.类型 == "武器" ? 0 : 1;
-                            let attr:AttrObject = _C.MainConfig.Strengthen.attr[type][data.strengthen.level - 1];
+                            let attr: AttrObject = _C.MainConfig.Strengthen.attr[type][data.strengthen.level - 1];
                             for (let i in attr) {
                                 str += "\n  " + i + ": " + Tool.valueToString(attr[i], i);
                             }
@@ -355,7 +355,7 @@ async function start() {
                         }
                         win.addLabel(str);
                     }
-                    mc.getPlayer(sender.getName())!.sendForm(win, ()=>{});
+                    mc.getPlayer(sender.getName())!.sendForm(win, () => { });
                     return;
                 }
                 let vipLv = 0;// LoadFunc.callbackString("getVIPLevel", 0, sender.getName());
@@ -380,39 +380,39 @@ async function start() {
                     }
                     forging = item.getNamedTag().getString('forging');
                     if (forging) {
-                       ShowObj.get(uid)["forging"] = JSON.parse(forging);
+                        ShowObj.get(uid)["forging"] = JSON.parse(forging);
                     }
                     bindinfo = item.getNamedTag().getString('PlayerBind');
                     if (bindinfo) {
-                       ShowObj.get(uid)["bindinfo"] = JSON.parse(bindinfo).name;
+                        ShowObj.get(uid)["bindinfo"] = JSON.parse(bindinfo).name;
                     }
                     seikoinfo = item.getNamedTag().getString('Seiko');
                     if (seikoinfo) {
-                       ShowObj.get(uid)["seikoinfo"] = JSON.parse(seikoinfo);
+                        ShowObj.get(uid)["seikoinfo"] = JSON.parse(seikoinfo);
                     }
                     strengthen = item.getNamedTag().getString('Strengthen');
                     if (strengthen) {
-                       ShowObj.get(uid)["strengthen"] = JSON.parse(strengthen);
+                        ShowObj.get(uid)["strengthen"] = JSON.parse(strengthen);
                     }
                     runeBore = item.getNamedTag().getList('runeBore');
                     if (runeBore && item.getNamedTag().contains('runeBore')) {// listTag需要使用contains判断是否存在
-                       ShowObj.get(uid)["runeBore"] = runeBore.parseValue();
+                        ShowObj.get(uid)["runeBore"] = runeBore.parseValue();
                     }
                 }
-                server.broadcastMessage('[NWeapon] ' +ShowObj.get(uid).player + ' 展示了 ' +ShowObj.get(uid).name + ' §r使用 §7/nwe show ' + uid + ' §r可查看详细页面');
+                server.broadcastMessage('[NWeapon] ' + ShowObj.get(uid).player + ' 展示了 ' + ShowObj.get(uid).name + ' §r使用 §7/nwe show ' + uid + ' §r可查看详细页面');
                 server.dispatchCommand(sender, 'nwe show ' + uid);
                 if (!PlayerShowCount.has(ShowObj.get(uid).player)) {
                     PlayerShowCount.set(ShowObj.get(uid).player, 1);
                 } else {
-                    PlayerShowCount.set(ShowObj.get(uid).player, <number>PlayerShowCount.get(ShowObj.get(uid).player)+1);
+                    PlayerShowCount.set(ShowObj.get(uid).player, <number>PlayerShowCount.get(ShowObj.get(uid).player) + 1);
                 }
                 // 一分钟后销毁分享
                 addTimeoutTask(new Date().getTime() + 60000, {
                     func: function (uid: string) {
-                        PlayerShowCount.set(ShowObj.get(uid).player, <number>PlayerShowCount.get(ShowObj.get(uid).player)-1);
+                        PlayerShowCount.set(ShowObj.get(uid).player, <number>PlayerShowCount.get(ShowObj.get(uid).player) - 1);
                         let player = server.getPlayer(ShowObj.get(uid).player);
                         if (player != null) {
-                            player.sendMessage("[NWeapon] §7您分享的 " +ShowObj.get(uid).name + " §r- " + uid + " §7已失效.");
+                            player.sendMessage("[NWeapon] §7您分享的 " + ShowObj.get(uid).name + " §r- " + uid + " §7已失效.");
                         }
                         ShowObj.delete(uid);
                     },
@@ -627,7 +627,7 @@ async function start() {
         cmd.setEnum("LockAction", ["lock", "unlock"]);// 上锁手持装备(不会被分解) / 解锁
 
         cmd.setEnum("RuneAction", ["rune"]);// 符文
-        cmd.setEnum("RuneNextAction", ["inlay", "take", "锻造图"]);// 镶嵌符文 / 拆卸符文
+        cmd.setEnum("RuneNextAction", ["inlay", "take"]);// 镶嵌符文 / 拆卸符文
         cmd.setEnum("RuneBoreAction", ["bore"]);// 为玩家手中装备打符文孔
         cmd.setEnum("UpgradeAction", ["upgrade"]);// 打开一个转换炉用于升级/更新装备
         cmd.setEnum("EffectAction", ["effect"]);// 打开一个转换炉用于升级/更新装备
@@ -635,7 +635,7 @@ async function start() {
 
 
         cmd.setEnum("UsuallyAction", ["seiko", "inlay", "strengthen", "offhand"]);// 精工装备, 装备宝石镶嵌, 装备强化, 将手持物品与副手调换, 
-        cmd.setEnum("ItemType", ["gem", "armor", "weapon"]);
+        cmd.setEnum("ItemType", ["armor", "weapon", "gem", "rune", "jewelry", "锻造图", "强化石"]);
         cmd.setEnum("CheckType", ["attr", "dz"]);
         cmd.setEnum("clear", ["clear"]);
         cmd.setEnum("attrName", ["暴击倍率", "吸血倍率", "护甲强度", "反伤倍率", "经验加成", "暴击率", "吸血率", "破防率", "反伤率", "闪避率", "暴击抵抗", "吸血抵抗", "命中率", "伤害加成", "攻击加成", "防御加成", "生命加成",
@@ -695,47 +695,45 @@ async function start() {
     });
     import("healthapi.PlayerHealth")
         .then(({ PlayerHealth }) => {
-        exposeObject('NWeapon_RSHealthAPI', PlayerHealth); // 获取血量核心插件
-    })
+            exposeObject('NWeapon_RSHealthAPI', PlayerHealth); // 获取血量核心插件
+        })
         .catch((err) => {
-        console.error(err.stack);
-    });
+            console.error(err.stack);
+        });
     import("cn.ankele.plugin.MagicItem")
         .then(({ MagicItem }) => {
-        exposeObject('NWeapon_MagicItem', MagicItem); // 获取魔法物品插件
-    })
+            exposeObject('NWeapon_MagicItem', MagicItem); // 获取魔法物品插件
+        })
         .catch((err) => {
-        console.error(err.stack);
-    });
+            console.error(err.stack);
+        });
     import("com.smallaswater.littlemonster.entity.LittleNpc")
         .then(({ LittleNpc }) => {
-        exposeObject('NWeapon_LittleNpc', LittleNpc); // 副本插件
-    })
+            exposeObject('NWeapon_LittleNpc', LittleNpc); // 副本插件
+        })
         .catch((err) => {
-        console.error(err.stack);
-    });
+            console.error(err.stack);
+        });
     import("com.smallaswater.npc.entitys.EntityRsNPC")
         .then(({ EntityRsNPC }) => {
-        exposeObject('NWeapon_RsNPC', EntityRsNPC); // 获取若水NPC
-    })
+            exposeObject('NWeapon_RsNPC', EntityRsNPC); // 获取若水NPC
+        })
         .catch((err) => {
-        console.error(err.stack);
-    });
-    import('./event/damage.js')
+            console.error(err.stack);
+        });
+    import('./event/register.js')
+        .then(load => {
+            load.default();
+        })
         .catch((err) => {
-            console.warn(err.stack)
-        console.error('./event/damage  loading failed.');
-    });
-    import('./event/playerItemHeld.js')
-        .catch((err) => {
-            console.warn(err.stack)
-        console.error('./event/playerItemHeld  loading failed.');
-    });
+            console.warn(err.stack);
+            console.error('./event/register  loading failed.');
+        });
     import('./task/runPlayerLoopTask.js')
         .catch((err) => {
             console.warn(err.stack)
-        console.error('./task/runPlayerLoopTask  loading failed.');
-    });
+            console.error('./task/runPlayerLoopTask  loading failed.');
+        });
     exposeObject('NWeapon_Skill', null);
 }
 
@@ -745,7 +743,7 @@ export function main() {
             console.log("NWeapon start done!")
         })
         .catch((err) => {
-            console.error("NWeapon start error:\n"+err.stack);
+            console.error("NWeapon start error:\n" + err.stack);
         });
 }
 

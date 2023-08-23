@@ -5,7 +5,6 @@ pnx.listenEvent("cn.nukkit.event.inventory.InventoryCloseEvent", EventPriority.N
     let player = event.getPlayer();
     let inv = event.getInventory();
     let invName = inv.getName().substring(0, 6);
-    if (event.isCancelled()) return;
 	let FakeInvCloseEventHook = contain('FakeInvCloseEventHook');
     FakeInvCloseEventHook.has(invName) && FakeInvCloseEventHook.get(invName).call(this, event, player, inv);
 });

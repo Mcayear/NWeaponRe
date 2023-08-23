@@ -6,9 +6,9 @@ import { EquipmentEntryType } from '../../interface/ForgeEntryType.js';
 
 import { Server } from "cn.nukkit.Server";
 
-type JInventory = cn.nukkit.inventory.Inventory;
 type JPlayer = cn.nukkit.Player;
 type JItem = cn.nukkit.item.Item;
+type JInventory = cn.nukkit.inventory.Inventory;
 
 const server = Server.getInstance();
 let closeEventMap = contain('FakeInvCloseEventHook');
@@ -94,7 +94,7 @@ export function StrengthFakeInvClose(event: any, player: JPlayer, inv: JInventor
                     return backItem("");
                 }
                 let oldLore = blockitem.getItemLore(HandItem),
-                    probability = _C.MainConfig.Strengthen.chance[nbtObj.level] + Tool.defineData(strengthFailedNum.get(player.getName())) * _C.MainConfig.Strengthen.failedAddition,
+                    probability = _C.MainConfig.Strengthen.chance[nbtObj.level] + Tool.defineData(strengthFailedNum.get(player.getName()) || 0) * _C.MainConfig.Strengthen.failedAddition,
                     failProtect = 0,
                     straightUp = 0,
                     luck = false;

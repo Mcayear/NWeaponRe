@@ -322,6 +322,7 @@ export function onlyNameGetItem(type: string, itemname: string, count?: any, sen
             obj = _C.JewelryConfig[itemname] || File.readFrom("./plugins/NWeapon/Jewelry/" + itemname + ".yml");
             break;
         }
+        case "图纸":
         case "锻造图":
         case "paper": {
             obj = _C.PaperConfig[itemname] || File.readFrom("./plugins/NWeapon/锻造图/" + itemname + ".yml");
