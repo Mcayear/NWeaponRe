@@ -26,7 +26,7 @@ isExistDir('./plugins/NWeapon/Weapon');
 isExistDir('./plugins/NWeapon/Gem');
 isExistDir('./plugins/NWeapon/Rune');
 isExistDir('./plugins/NWeapon/Jewelry');
-isExistDir('./plugins/NWeapon/锻造图');
+isExistDir('./plugins/NWeapon/ForgeBlueprint');
 isExistDir('./plugins/NWeapon/OtherItem');
 isExistDir('./plugins/NWeapon/PlayerAttrData');
 
@@ -200,7 +200,7 @@ var RuneConfig: any = {};
 var WeaponConfig: any = {};
 var ArmorConfig: any = {};
 var JewelryConfig: any = {};
-var PaperConfig: any = {};
+var ForgeBlueprintConfig: any = {};
 var NbtItem = JSON.parse(Util.YAMLtoJSON(File.readFrom("./plugins/ItemNbt/NbtItem.yml") || '{}'));
 var ForgeEntry: any = {};
 
@@ -210,7 +210,7 @@ getRuneConfig();
 getWeaponConfig();
 getArmorConfig();
 getJewelryConfig();
-getPaperConfig();
+getForgeBlueprintConfig();
 
 // 读取玩家&NBT物品数据
 export function getItData() {
@@ -314,10 +314,10 @@ export function getJewelryConfig() {
     logger.info('读取了 ' + trdirl.length + ' 个 饰品 配置文件');
 }
 // 读取锻造图配置文件
-export function getPaperConfig() {
-    let trdirl = File.getFilesList('./plugins/NWeapon/锻造图');
+export function getForgeBlueprintConfig() {
+    let trdirl = File.getFilesList('./plugins/NWeapon/ForgeBlueprint');
     for (var i = 0; i < trdirl.length; i++) {
-        let path = './plugins/NWeapon/锻造图/'+trdirl[i];
+        let path = './plugins/NWeapon/ForgeBlueprint/'+trdirl[i];
         let temp = JSON.parse(Util.YAMLtoJSON(<string>File.readFrom(path)));
         // tran
         let res = Tool.numberIdToStringId(temp, "外形");
@@ -325,11 +325,11 @@ export function getPaperConfig() {
             File.writeTo(path, Util.JSONtoYAML(JSON.stringify(res[1])));
         }
         // tran - end
-        PaperConfig[temp.名字] = temp;
+        ForgeBlueprintConfig[temp.名字] = temp;
         if (temp.添加到创造背包) {
             blockitem.addToCreativeBar(Tool.getItem(temp.名字, temp));
         }
-        delete PaperConfig[temp.名字].名字;
+        delete ForgeBlueprintConfig[temp.名字].名字;
     }
     logger.info('读取了 ' + trdirl.length + ' 个 锻造 配置文件');
 }
@@ -368,7 +368,7 @@ export var _C = {
         "护甲": "Armor",
         "饰品": "Jewelry",
         "宝石": "Gem",
-        "图纸": "Paper",
+        "图纸": "ForgeBlueprint",
         "符文": "Rune",
         "锻造石": "FStone",// Forging Stone
         "精工石": "SeikoStone",// Seiko Stone
@@ -386,5 +386,5 @@ export var _C = {
     WeaponConfig,
     ArmorConfig,
     JewelryConfig,
-    PaperConfig
+    ForgeBlueprintConfig
 }

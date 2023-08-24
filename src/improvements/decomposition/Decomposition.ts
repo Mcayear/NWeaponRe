@@ -3,6 +3,7 @@ import { Server } from 'cn.nukkit.Server';
 import * as blockitem from '../../util/blockitem.js';
 import { getNWeaponConfig } from '../../util/Tool.js';
 import { PlayerBindNBTType } from '../GetAttributeMain.js' ;
+import { _CType } from '../../interface/ConfigType.js';
 
 type JItem = cn.nukkit.item.Item;
 type JPlayer = cn.nukkit.Player;
@@ -13,8 +14,8 @@ const server = Server.getInstance();
  * @param {JPlayer} player 玩家对象
  * @param {JItem[]} list 待分解的物品列表
  */
-export function NWeaponDecomposition(player: JPlayer, list: JItem[]) {
-    const _C = contain("NWeapon_C");
+export function decomposition(player: JPlayer, list: JItem[]) {
+    const _C: _CType = contain("NWeapon_C");
     for (let i = 0; i < list.length; i++) {
         const name = list[i].getCustomName() || list[i].getName();
         if (list[i].getNamedTag() == null) {
@@ -53,9 +54,9 @@ export function NWeaponDecomposition(player: JPlayer, list: JItem[]) {
             }
             blockitem.removeItemFromPlayer(player, list[i]);
         } else if (cmdlist2) {
-            cmdlist2 = cmdlist2.split("\n");
-            for (let n in cmdlist2) {
-                server.dispatchCommand(server.getConsoleSender(), cmdlist2[n].replace("{player}", player.getName()));
+            let cmdlist = cmdlist2.split("\n");
+            for (let n in cmdlist) {
+                server.dispatchCommand(server.getConsoleSender(), cmdlist[n].replace("{player}", player.getName()));
             }
             blockitem.removeItemFromPlayer(player, list[i]);
         } else {

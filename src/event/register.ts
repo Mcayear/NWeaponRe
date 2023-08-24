@@ -36,7 +36,7 @@ export default function () {
             console.warn(err.stack);
             console.error('../enhancements/strength/StrengthFakeInvClose  loading failed.');
         });
-    import('../improvements/forging/ForgingFakeInvClose.js')
+    import('../enhancements/forging/ForgingFakeInvClose.js')
         .catch((err) => {
             console.warn(err.stack);
             console.error('../improvements/forging/ForgingFakeInvClose  loading failed.');

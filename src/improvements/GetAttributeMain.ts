@@ -1,8 +1,9 @@
 import * as inventory from '../util/inventory.js';
 import * as blockitem from '../util/blockitem.js';
-import { getNWeaponConfig, itemBindPlayer, ItemConfigType, onlyNameGetItem } from '../util/Tool.js';
+import { getNWeaponConfig, itemBindPlayer, onlyNameGetItem } from '../util/Tool.js';
 import { SetPlayerAttr, GetPlayerAttr } from './AttrComp.js';
-import { ForgingAttrNbtType } from './forging/ForgingFakeInvClose.js';
+import { ForgingAttrNbtType } from '../enhancements/forging/ForgingFakeInvClose.js';
+import { EquipmentType, _CType } from '../interface/ConfigType.js';
 
 type JPlayer = cn.nukkit.Player;
 type JItem = cn.nukkit.item.Item;
@@ -27,14 +28,14 @@ interface AttrInsideType {
 } 
 
 export default function getAttributeMain(player: JPlayer): AttrInsideType {
-    const _C = contain("NWeapon_C");
+    const _C: _CType = contain("NWeapon_C");
     let result: AttrInsideType = {};
     let ItemList = [blockitem.getItemInHand(player)];
     let inv = inventory.getPlayerInv(player);
     if (!inv) return {};
     let SlotList = [player.getInventory().getHeldItemIndex(), 36, 37, 38, 39];
     var effectSuit: {[key: string]: number} = {};
-    let EquipAttrCore = function (item: JItem, attrList: ItemConfigType) {
+    let EquipAttrCore = function (item: JItem, attrList: EquipmentType) {
         let suitName = attrList.套装;
         if (suitName) {
             if (effectSuit[suitName]) {
@@ -94,9 +95,10 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
                 let attr = attrdata[key];
                 if (typeof (attr) === "string") {
                     const arr = attr.split("-");
-                    attr = [Number(arr[0]), Number(arr[1])];
+                    result[key] = MergeAttrValue(result[key], [Number(arr[0]), Number(arr[1])]);
+                } else {
+                    result[key] = MergeAttrValue(result[key], attr);
                 }
-                result[key] = MergeAttrValue(result[key], attr);
             }
         }
         let strengthenTag = item.getNamedTag().getString('Strengthen');
@@ -108,9 +110,10 @@ export default function getAttributeMain(player: JPlayer): AttrInsideType {
                 let attr = attrdata[key];
                 if (typeof (attr) === "string") {
                     const arr = attr.split("-");
-                    attr = [Number(arr[0]), Number(arr[1])];
+                    result[key] = MergeAttrValue(result[key], [Number(arr[0]), Number(arr[1])]);
+                } else {
+                    result[key] = MergeAttrValue(result[key], attr);
                 }
-                result[key] = MergeAttrValue(result[key], attr);
             }
         }
         let runeBore = item.getNamedTag().getList('runeBore');

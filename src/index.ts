@@ -42,14 +42,14 @@ interface AttrObject {
 async function start() {
     const {
         version, getGradeSymbol, _C, TaskExecList,
-        getItData, getArmorConfig, getGemConfig, getJewelryConfig, getPaperConfig, getRuneConfig, getWeaponConfig
+        getItData, getArmorConfig, getGemConfig, getJewelryConfig, getForgeBlueprintConfig, getRuneConfig, getWeaponConfig
     } = await import('./util/WeaponConfig.js');
     const { mc, File, ParamType, PermType } = await import('@LLSELib');
     const { Util: UtilClass } = await import('cn.vusv.njsutil.Util');
     const Tool = await import('./util/Tool.js');
     const { SetPlayerAttr, GetPlayerAttr } = await import('./improvements/AttrComp.js');
-    const { ForgingFakeInvChange } = await import('./improvements/forging/ForgingFakeInvChange.js');
-    const { NWeaponDecomposition } = await import('./improvements/Decomposition/NWeaponDecomposition.js');
+    const { ForgingFakeInvChange } = await import('./enhancements/forging/ForgingFakeInvChange.js');
+    const { decomposition } = await import('./improvements/decomposition/Decomposition.js');
     const { checkAttr } = await import('./improvements/check/check.js');
     const { sendGemInlayWin } = await import('./enhancements/gem/sendGemInlayWin.js');
     const { sendStrengthenWin } = await import('./enhancements/strength/sendStrengthenWin.js');
@@ -154,7 +154,7 @@ async function start() {
                 break;
             }
             case "分解": {
-                NWeaponDecomposition(sender, [blockitem.getItemInHand(sender)]);
+                decomposition(sender, [blockitem.getItemInHand(sender)]);
                 break;
             }
             case "分解快捷栏": {
@@ -170,7 +170,7 @@ async function start() {
                         itemlist.push(item);
                     }
                 }
-                NWeaponDecomposition(sender, itemlist);
+                decomposition(sender, itemlist);
                 break;
             }
             case "inlay": {
@@ -427,14 +427,14 @@ async function start() {
                 }
                 out.success("[NWeapon] 配置文件已重载.");
                 _C.MainConfig = JSON.parse(Util.YAMLtoJSON(<string>File.readFrom("./plugins/NWeapon/Config.yml")));
-                _C.PlayerData = {}, _C.GemConfig = {}, _C.RuneConfig = {}, _C.WeaponConfig = {}, _C.ArmorConfig = {}, _C.JewelryConfig = {}, _C.PaperConfig = {};
+                _C.PlayerData = {}, _C.GemConfig = {}, _C.RuneConfig = {}, _C.WeaponConfig = {}, _C.ArmorConfig = {}, _C.JewelryConfig = {}, _C.ForgeBlueprintConfig = {};
                 getItData();
                 getGemConfig();
                 getRuneConfig();
                 getWeaponConfig();
                 getArmorConfig();
                 getJewelryConfig();
-                getPaperConfig();
+                getForgeBlueprintConfig();
                 break;
             }
             case "give":
@@ -635,7 +635,7 @@ async function start() {
 
 
         cmd.setEnum("UsuallyAction", ["seiko", "inlay", "strengthen", "offhand"]);// 精工装备, 装备宝石镶嵌, 装备强化, 将手持物品与副手调换, 
-        cmd.setEnum("ItemType", ["armor", "weapon", "gem", "rune", "jewelry", "锻造图", "强化石"]);
+        cmd.setEnum("ItemType", ["armor", "weapon", "gem", "rune", "jewelry", "锻造图", "paper", "forge", "强化石"]);
         cmd.setEnum("CheckType", ["attr", "dz"]);
         cmd.setEnum("clear", ["clear"]);
         cmd.setEnum("attrName", ["暴击倍率", "吸血倍率", "护甲强度", "反伤倍率", "经验加成", "暴击率", "吸血率", "破防率", "反伤率", "闪避率", "暴击抵抗", "吸血抵抗", "命中率", "伤害加成", "攻击加成", "防御加成", "生命加成",

@@ -1,3 +1,7 @@
+## Wiki
+
+[NWeaponRe Wiki](https://github.com/Mcayear/NWeaponRe/wiki)
+
 ## 如何编译
 
 安装TypeScript
