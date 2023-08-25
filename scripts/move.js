@@ -23,9 +23,14 @@ async function copyFolder(src, dest) {
 
 async function copyFiles() {
   try {
-    await copyFile(path.join(__dirname, '../src/plugin.yml'), path.join(__dirname, '../dist/@NWeaponRe/src/plugin.yml'));
+    let middle = ''; // 中间件
+    if (fs.existsSync(path.join(__dirname, '../dist/@NWeaponRe/src/'))) {
+      console.log('find the directory: ../dist/@NWeaponRe/src/');
+      middle = "src/";
+    }
+    await copyFile(path.join(__dirname, '../src/plugin.yml'), path.join(__dirname, '../dist/@NWeaponRe/'+middle+'plugin.yml'));
     console.log('plugin.yml copied successfully!');
-    await copyFolder(path.join(__dirname, '../src/resource/'),  path.join(__dirname, '../dist/@NWeaponRe/src/resource/'));
+    await copyFolder(path.join(__dirname, '../src/resource/'),  path.join(__dirname, '../dist/@NWeaponRe/'+middle+'src/resource/'));
     console.log('resource copied successfully!');
   } catch (err) {
     console.error(err);

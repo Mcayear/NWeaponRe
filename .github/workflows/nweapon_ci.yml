@@ -30,10 +30,7 @@ jobs:
     - name: Build
       run: |
         pwd
-        ls /home/runner/work/NWeaponRe/NWeaponRe/src/
-        ls /home/runner/work/NWeaponRe/NWeaponRe/dist/@NWeaponRe
         node ./scripts/move.js
-        ls ./dist
         node ./scripts/package.js
         ls ./dist
     - name: Create Artifact
