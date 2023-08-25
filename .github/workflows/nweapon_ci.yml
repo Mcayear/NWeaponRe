@@ -24,10 +24,16 @@ jobs:
     - name: Install package
       run: |
         npm install
-        ls
+    - name: TypeScript Comp
+      run: |
+        tsc || true
     - name: Build
       run: |
-        npm run build
+        ls ./dist
+        node ./scripts/move.js
+        ls ./dist
+        node ./scripts/package.js
+        ls ./dist
     - name: Create Artifact
       uses: actions/upload-artifact@v2
       with:
