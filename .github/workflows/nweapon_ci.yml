@@ -26,7 +26,7 @@ jobs:
         npm install
     - name: TypeScript Comp
       run: |
-        tsc || true
+        tsc > /dev/null || true
     - name: Build
       run: |
         pwd
@@ -36,5 +36,5 @@ jobs:
     - name: Create Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: built-artifact
+        name: "@NWeaponRe.zip"
         path: /home/runner/work/NWeaponRe/NWeaponRe/dist/@NWeaponRe.zip
