@@ -22,7 +22,7 @@ async function copyFolder(src, dest) {
 }
 
 async function copyFiles() {
-  console.log(__dirname);
+  console.log("dirname: "+__dirname);
   try {
     await copyFile('./src/plugin.yml', './dist/@NWeaponRe/src/plugin.yml');
     console.log('plugin.yml copied successfully!');
