@@ -26,10 +26,10 @@ jobs:
         npm install
     - name: TypeScript Comp
       run: |
-        tsc || true
+        tsc > /dev/null
     - name: Build
       run: |
-        ls ./dist
+        pwd
         node ./scripts/move.js
         ls ./dist
         node ./scripts/package.js
