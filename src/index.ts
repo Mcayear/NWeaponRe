@@ -52,6 +52,7 @@ async function start() {
     const { decomposition } = await import('./improvements/decomposition/Decomposition.js');
     const { checkAttr } = await import('./improvements/check/check.js');
     const { sendGemInlayWin } = await import('./enhancements/gem/sendGemInlayWin.js');
+    const { sendSeikoWin } = await import('./enhancements/seiko/sendSeikoWin.js');
     const { sendStrengthenWin } = await import('./enhancements/strength/sendStrengthenWin.js');
     const { toPerformedRuneWeapon } = await import('./improvements/rune/toPerformedRuneWeapon.js');
     const { sendRuneInlayWin } = await import('./enhancements/rune/sendRuneInlayWin.js');
@@ -274,7 +275,7 @@ async function start() {
             }
             case "seiko": {
                 if (_C.MainConfig.Seiko.enable) {
-                    //TODO: sendSeikoWin(sender);
+                    sendSeikoWin(sender);
                 } else {
                     out.error("[NWeapon] 管理员未启用精工");
                 }
