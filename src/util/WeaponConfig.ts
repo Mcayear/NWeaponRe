@@ -3,6 +3,7 @@ import { File as jFile } from 'java.io.File';
 import { Util as UtilClass } from 'cn.vusv.njsutil.Util';
 import * as Tool from './Tool.js';
 import * as blockitem from './blockitem.js';
+import { PlayearForgeDataType } from '../interface/ConfigType.js';
 
 const Util = new UtilClass();
 
@@ -28,7 +29,8 @@ isExistDir('./plugins/NWeapon/Rune');
 isExistDir('./plugins/NWeapon/Jewelry');
 isExistDir('./plugins/NWeapon/ForgeBlueprint');
 isExistDir('./plugins/NWeapon/OtherItem');
-isExistDir('./plugins/NWeapon/PlayerAttrData');
+isExistDir('./plugins/NWeapon/_PlayerData/attr');
+isExistDir('./plugins/NWeapon/_PlayerData/forge');
 
 if (!File.readFrom('./plugins/NWeapon/Config.yml')) {
     File.copy("./plugins/@NWeaponRe/resource/Config.yml", "./plugins/NWeapon/Config.yml");
@@ -194,7 +196,6 @@ setInterval(() => {
     __NWeaponExecTaskList();
 }, 500);
 
-var PlayerData: any = {};
 var GemConfig: any = {};
 var RuneConfig: any = {};
 var WeaponConfig: any = {};
@@ -214,7 +215,6 @@ getForgeBlueprintConfig();
 
 // 读取玩家&NBT物品数据
 export function getItData() {
-    PlayerData = JSON.parse(<string>File.readFrom("./plugins/NWeapon/PlayerData.json"));
     NbtItem = JSON.parse(Util.YAMLtoJSON(File.readFrom("./plugins/ItemNbt/NbtItem.yml") || '{}'));
     ForgeEntry = JSON.parse(Util.YAMLtoJSON(File.readFrom("./plugins/NWeapon/ForgeEntry.yml") || '{}'));
 }
@@ -359,6 +359,48 @@ export const getGradeSymbol = {
     }
 }
 
+class PlayearForgeDataProxy {
+    private data: Map<string, PlayearForgeDataType>;
+
+    constructor() {
+        this.data = new Map();
+    }
+
+    private writeToFile(name: string) {
+        File.writeTo("./plugins/NWeapon/_PlayerData/forge/"+name+".json", JSON.stringify(this.data.get(name) || {}, null, 2));
+    }
+
+    has(key: string): boolean {
+        return File.exists("./plugins/NWeapon/_PlayerData/forge/"+key+".json");
+    }
+
+    set(key: string, value: PlayearForgeDataType) {
+        this.data.set(key, value);
+        this.writeToFile(key);
+    }
+
+    get(key: string): PlayearForgeDataType {
+        if (this.data.has(key)) {
+            return this.data.get(key) as PlayearForgeDataType;
+        }
+        if (this.has(key)) {
+            this.data.set(key, JSON.parse(File.readFrom("./plugins/NWeapon/_PlayerData/forge/"+key+".json") as string) as PlayearForgeDataType);
+        } else {
+            this.data.set(key, {
+                level: 0,
+                exp: 0,
+                req: 0
+            });
+        }
+        return (this.data.get(key) as PlayearForgeDataType);
+    }
+
+    clear(): void {
+        this.data.clear();
+    }
+}
+
+let _PlayearForgeData = new PlayearForgeDataProxy();
 /**
  * 配置文件对象
  */
@@ -377,7 +419,6 @@ export var _C = {
     },
     MainConfig,
 
-    PlayerData,
     NbtItem,
     ForgeEntry,
 
@@ -386,5 +427,6 @@ export var _C = {
     WeaponConfig,
     ArmorConfig,
     JewelryConfig,
-    ForgeBlueprintConfig
+    ForgeBlueprintConfig,
+    _PlayerForgeData: _PlayearForgeData,
 }

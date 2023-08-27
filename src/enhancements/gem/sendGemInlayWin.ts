@@ -109,12 +109,12 @@ export function sendGemInlayWin(player: JPlayer) {
                 let arr = item.getNamedTag().getString('NWeaponNameTag').split(";");
                 if (arr[0] === _C.ItemTypeList["宝石券"]) {
                     let count = 1;
-                    let luck_: number = Number(item.getNamedTag().getString('Luck')) || 0;
-                    let failProtect_: number = Number(item.getNamedTag().getString('FailProtect')) || 0;
+                    let luck_: number = Number(item.getNamedTag().getFloat('Luck')) || 0;
+                    let failProtect_: number = Number(item.getNamedTag().getByte('FailProtect')) || 0;
                     if (luck && luck_) {
                         continue;
                     } else if (luck_ > 0) {
-                        if (item.getNamedTag().getString('stacking')) {
+                        if (item.getNamedTag().getByte('stacking')) {
                             count = Math.ceil(1 / luck_);
                             if (item.getCount() < count) {
                                 count = item.getCount();

@@ -14,7 +14,7 @@ const server = Server.getInstance();
 let closeEventMap = contain('FakeInvCloseEventHook');
 closeEventMap.set(FakeInvName.Strangth, StrengthFakeInvClose);
 
-let _C: _CType = contain('NWeapon_C');
+const _C: _CType = contain('NWeapon_C');
 
 const { mc } = await import('@LLSELib');
 
@@ -105,9 +105,9 @@ export function StrengthFakeInvClose(event: any, player: JPlayer, inv: JInventor
                         let arr: string[] = item.getNamedTag().getString('NWeaponNameTag').split(";");
                         if (arr[0] === _C.ItemTypeList["强化石"]) {
                             let count = 1;
-                            let luck_ = item.getNamedTag().contains('Luck') ? Number(item.getNamedTag().getString('Luck')) : 0;
-                            let failProtect_ = item.getNamedTag().contains('FailProtect') ? Number(item.getNamedTag().getString('FailProtect')) : 0;
-                            let straightUp_ = item.getNamedTag().contains('StraightUp') ? Number(item.getNamedTag().getString('StraightUp')) : 0;
+                            let luck_ = item.getNamedTag().contains('Luck') ? Number(item.getNamedTag().getFloat('Luck')) : 0;
+                            let failProtect_ = item.getNamedTag().contains('FailProtect') ? Number(item.getNamedTag().getByte('FailProtect')) : 0;
+                            let straightUp_ = item.getNamedTag().contains('StraightUp') ? Number(item.getNamedTag().getInt('StraightUp')) : 0;
                             if (straightUp && straightUp_) {
                                 continue;
                             }
@@ -123,7 +123,7 @@ export function StrengthFakeInvClose(event: any, player: JPlayer, inv: JInventor
                                 continue;
                             }
                             if (!isNaN(luck_) && luck_ > 0) {
-                                if (item.getNamedTag().getString('stacking')) {
+                                if (item.getNamedTag().getByte('stacking')) {
                                     count = Math.ceil(1 / luck_);
                                     if (item.getCount() < count) {
                                         count = item.getCount();

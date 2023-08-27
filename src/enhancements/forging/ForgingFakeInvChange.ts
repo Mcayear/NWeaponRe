@@ -1,6 +1,7 @@
 import * as blockitem from '../../util/blockitem.js';
 import * as Tool from '../../util/Tool.js';
 import { getNWeaponConfig } from '../../util/Tool.js';
+import { EquipmentType, ForgingAttrType, _CType } from '../../interface/ConfigType.js';
 
 
 /** 锻造 - 虚拟物品栏物品更改事件处理 */
@@ -10,19 +11,18 @@ export function ForgingFakeInvChange(event: com.nukkitx.fakeinventories.inventor
     var inv = event.getAction().getInventory();
     var newItem = event.getAction().getTargetItem();
     /** 获取共享变量 */
-    var _C = contain('NWeapon_C');
+    var _C: _CType = contain('NWeapon_C');
     /** 玩家的一些临时数据 */
     var PlayerSmithingTempData = contain('PlayerSmithingTempData');
     if (slot == 0) {
         /** 配置文件的图纸数据 */
-        let paperData = _C.PaperConfig[newItem.getCustomName()];
+        let paperData = _C.ForgeBlueprintConfig[newItem.getCustomName()];
         if (!paperData) {
             player.sendMessage("[NWeapon] §c锻造图纸不存在");
             event.setCancelled(true);
             return;
         }
-        if (!_C.PlayerData[player.getName()]) _C.PlayerData[player.getName()] = { exp: 0, level: 0 };
-        if (paperData.限制等级 > _C.PlayerData[player.getName()].level) {
+        if (paperData.限制等级 > _C._PlayerForgeData.get(player.getName()).level) {
             player.sendMessage("[NWeapon] §c您的锻造师等级不足");
             event.setCancelled(true);
             return;

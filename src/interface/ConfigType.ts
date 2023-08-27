@@ -22,39 +22,41 @@ export interface EquipmentType {
 	限制等级: number;
 	是否在创造背包显示?: boolean;
 	不可强化?: boolean;
-    不显示属性?: string;
-    镶嵌?: string[];
+	不显示属性?: string;
+	镶嵌?: string[];
 	无限耐久?: boolean;
-    不可分解?: boolean;
+	不可分解?: boolean;
 	染色?: {
 		r: number;
 		g: number;
 		b: number;
 	}
-    套装?: string;
-    定制者?: string;
-    生效槽?: number[];
+	套装?: string;
+	定制者?: string;
+	生效槽?: number[];
 
 	类别?: string;
-    强度?: number;// float
-    直升?: number;
-    幸运?: number;// float
-    堆叠使用?: boolean;
-    失败保护?: boolean;
-    禁止上架?: boolean;
-    符文?: string;
-    符文类型?: string;
+	强度?: number;// float
+	直升?: number;
+	幸运?: number;// float
+	堆叠使用?: boolean;
+	失败保护?: boolean;
+	禁止上架?: boolean;
+	符文?: string;
+	符文类型?: string;
 	耐久?: number;
 
 	消耗: boolean;
-    方案: [string[], string[]];
-    获得经验: number;
+	方案: [string[], string[]];
+	获得经验: number;
 }
 
 export interface WeaponConfigType extends EquipmentType {
 	击杀提示: string;
 	镶嵌: string[];
 	无限耐久?: boolean;
+	不可精工?: boolean;
+	不可强化?: boolean;
 }
 
 export interface ArmorConfigType extends EquipmentType {
@@ -65,18 +67,20 @@ export interface ArmorConfigType extends EquipmentType {
 	}
 	镶嵌: string[];
 	无限耐久?: boolean;
+	不可精工?: boolean;
+	不可强化?: boolean;
 }
 
 export interface ForgeBlueprintType {
-    类型: string;
-    外形: [string, number];
-    附魔: string[];
-    名字: string;
-    介绍: string;
-    消耗: boolean;
-    限制等级: number;
-    方案: [string[], string[]];
-    获得经验: number;
+	类型: string;
+	外形: [string, number];
+	附魔: string[];
+	名字: string;
+	介绍: string;
+	消耗: boolean;
+	限制等级: number;
+	方案: [string[], string[]];
+	获得经验: number;
 	可符文?: boolean;
 }
 
@@ -98,7 +102,7 @@ export interface MainConfigType {
 	品阶: string[];
 	稀有度: string[];
 	分解所得: [
-		{[key: string]: string[]},
+		{ [key: string]: string[] },
 		string[]
 	];
 	锻造模式: number;
@@ -117,12 +121,16 @@ export interface MainConfigType {
 	AttrDisplayPercent: string[];
 	useHarmFloatWord: boolean;
 	itemDefaultBind: boolean;
-	defaultAttr: {[key: string]: number };
+	defaultAttr: { [key: string]: number };
 	Seiko: {
 		enable: boolean;
 		need: string[];
+		needMoney: number[];
 		failedAddition: number;
-		attr: (string | number)[][][];
+		chance: number[];// 成功率
+		broadcastMessage: [number, string];// 广播消息
+		failed: number[][];
+		attr: [(string | number)[][], (string | number)[][]];
 	};
 	GradeSymbol: {
 		enable: boolean;
@@ -164,6 +172,19 @@ export interface MainConfigType {
 	};
 }
 
+export interface PlayearForgeDataType {
+	exp: number;// float
+	level: number;// int
+	req: number;// float
+}
+
+export interface PlayearForgeDataProxy {
+	has: (key: string) => boolean;
+	set: (key: string, value: PlayearForgeDataType) => void;
+	get: (key: string) => PlayearForgeDataType;
+	clear: () => void;
+}
+
 export interface ItemTypeList {
 	"武器": "Weapon",
 	"护甲": "Armor",
@@ -184,13 +205,14 @@ export interface _CType {
 	ItemTypeList: ItemTypeList;
 	ForgeEntry: ForgeEntryType;
 
-    PlayerData: any,
-    NbtItem: any,
+	PlayerData: any,
+	NbtItem: any,
 
-    GemConfig: { [key: string]: EquipmentType };
-    RuneConfig: { [key: string]: EquipmentType };
+	GemConfig: { [key: string]: EquipmentType };
+	RuneConfig: { [key: string]: EquipmentType };
 	WeaponConfig: { [key: string]: WeaponConfigType };
 	ArmorConfig: { [key: string]: ArmorConfigType };
-    JewelryConfig: { [key: string]: EquipmentType };
-    ForgeBlueprintConfig: { [key: string]: ForgeBlueprintType };
+	JewelryConfig: { [key: string]: EquipmentType };
+	ForgeBlueprintConfig: { [key: string]: ForgeBlueprintType };
+	_PlayerForgeData: PlayearForgeDataProxy;
 }

@@ -1,5 +1,6 @@
 import { valueToString } from '../../util/Tool.js';
 import { mc } from '@LLSELib';
+import { _CType } from '../../interface/ConfigType.js';
 
 
 export function checkAttr(sender: cn.nukkit.Player, p: cn.nukkit.Player, type: string): void;
@@ -14,19 +15,19 @@ export function checkAttr(sender: cn.nukkit.Player, p: cn.nukkit.Player, type: s
  * @returns 
  */
 export function checkAttr(sender: cn.nukkit.Player, p: cn.nukkit.Player, type: string, data?: any) {
-    const _C = contain("NWeapon_C");
+    const _C: _CType = contain("NWeapon_C");
     try {
         if (type === "dz") {
-            if (!_C.PlayerData[p.getName()]) {
+            if (!_C._PlayerForgeData.has(p.getName())) {
                 return sender.sendMessage("[NWeapon] 没有玩家§8" + p.getName() + "§f的数据");
             }
             let winx = mc.newCustomForm().
                 setTitle('锻造 - 信息 - ' + p.getName()).
                 // TODO: 已解锁图纸
                 //addLabel("\n§a┏一一一一 §l已解锁的图纸§r§a 一一一一┓§r\n未知...\n§2┗一一一一 §l已解锁的图纸§r§2 一一一一┛§r").
-                addLabel("当前等级: §a" + _C.PlayerData[p.getName()].level).
-                addLabel("当前经验: §a" + _C.PlayerData[p.getName()].exp).
-                addLabel("距离下一级(所需): §6" + _C.PlayerData[p.getName()].req);
+                addLabel("当前等级: §a" + _C._PlayerForgeData.get(p.getName()).level).
+                addLabel("当前经验: §a" + _C._PlayerForgeData.get(p.getName()).exp).
+                addLabel("距离下一级(所需): §6" + _C._PlayerForgeData.get(p.getName()).req);
             mc.getPlayer(sender.getName())!.sendForm(winx, function(){});
         } else if (type === "attr") {
             let str = "";

@@ -31,9 +31,8 @@ jobs:
       run: |
         pwd
         node ./scripts/move.js
-        ls ./dist
     - name: Create Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: "@NWeaponRe"
         path: /home/runner/work/NWeaponRe/NWeaponRe/dist/@NWeaponRe/

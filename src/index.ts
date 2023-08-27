@@ -428,7 +428,8 @@ async function start() {
                 }
                 out.success("[NWeapon] 配置文件已重载.");
                 _C.MainConfig = JSON.parse(Util.YAMLtoJSON(<string>File.readFrom("./plugins/NWeapon/Config.yml")));
-                _C.PlayerData = {}, _C.GemConfig = {}, _C.RuneConfig = {}, _C.WeaponConfig = {}, _C.ArmorConfig = {}, _C.JewelryConfig = {}, _C.ForgeBlueprintConfig = {};
+                _C._PlayerForgeData.clear();
+                _C.GemConfig = {}, _C.RuneConfig = {}, _C.WeaponConfig = {}, _C.ArmorConfig = {}, _C.JewelryConfig = {}, _C.ForgeBlueprintConfig = {};
                 getItData();
                 getGemConfig();
                 getRuneConfig();

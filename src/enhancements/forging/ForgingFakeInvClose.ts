@@ -1,8 +1,8 @@
 import * as blockitem from '../../util/blockitem.js';
 import * as Tool from '../../util/Tool.js';
-import { ForgeBlueprintType, EquipmentType } from '../../interface/ConfigType.js';
 import { FakeInvName } from '../../enum/FakeInvEnum.js';
-import { File } from '@LLSELib';
+import { ForgeBlueprintType, EquipmentType, _CType } from '../../interface/ConfigType.js';
+import { EquipmentEntryType } from '../../interface/ForgeEntryType.js';
 
 type JPlayer = cn.nukkit.Player;
 type JItem = cn.nukkit.item.Item;
@@ -26,7 +26,7 @@ export function ForgingFakeInvClose(event: any, player: JPlayer, inv: JInventory
         return player.sendMessage("[NWeapon] §7已取消锻造，未放入图纸");
     }
     /** 获取共享变量 */
-    var _C = contain('NWeapon_C');
+    const _C: _CType = contain('NWeapon_C');
     /** 玩家的一些临时数据 */
     var PlayerSmithingTempData = contain('PlayerSmithingTempData');
     let ForgeBlueprintData: ForgeBlueprintType|null = Tool.onlyNameGetItem('paper', drawing.getCustomName());
@@ -43,7 +43,7 @@ export function ForgingFakeInvClose(event: any, player: JPlayer, inv: JInventory
         weapon = inv.getItem(1);
         itemData = _C.WeaponConfig[weapon.getCustomName()] || _C.ArmorConfig[weapon.getCustomName()];
     } else {
-        let tag = PlayerSmithingTempData.get(player.getName()).方案[1][0].split('@')[1].split(':');
+        const tag = PlayerSmithingTempData.get(player.getName()).方案[1][0].split('@')[1].split(':');
         itemData = Tool.onlyNameGetItem(tag[0], tag[1]) as EquipmentType;
         weapon = Tool.getItem(null, itemData);
     }
@@ -98,29 +98,30 @@ export function ForgingFakeInvClose(event: any, player: JPlayer, inv: JInventory
     let paperExp = PlayerSmithingTempData.get(player.getName()).获得经验;
     PlayerSmithingTempData.delete(player.getName());
 
-    let index = Tool.getArrayProbabilisticResults(_C.MainConfig.锻造[1]), addxp = _C.MainConfig.锻造[1].length - index;
+    let index = Tool.getArrayProbabilisticResults(_C.MainConfig.锻造[1] as number[]), addxp = _C.MainConfig.锻造[1].length - index;
     if (paperExp) {
         addxp = 3+(paperExp * (Math.random() > 0.5 ? Tool.getRandomNum([1, 2]) : Tool.getRandomNum([0, 1])));
     }
     if (_C.MainConfig.ForingExp.onlySameLevel) {
-        if (ForgeBlueprintData.限制等级 < _C.PlayerData[player.getName()].level) {
+        if (ForgeBlueprintData.限制等级 < _C._PlayerForgeData.get(player.getName()).level) {
             player.sendMessage("[NWeapon] §7您正在锻造低等级图纸");
             addxp = _C.MainConfig.ForingExp.nonSameLevelGive;
         }
     }
     addxp = Number(addxp.toFixed(2));// 防止浮点数错误
-    _C.PlayerData[player.getName()].exp = Math.round((_C.PlayerData[player.getName()].exp + addxp) * 10000) / 10000;
-    _C.PlayerData[player.getName()].exp = Number(_C.PlayerData[player.getName()].exp.toFixed(2));// 防止浮点数错误
-    _C.PlayerData[player.getName()].level = Math.floor(eval(_C.MainConfig.锻造等级.等级公式.replace(/{经验}/g, _C.PlayerData[player.getName()].exp)));
-    if (isNaN(_C.PlayerData[player.getName()].level)) {
-        _C.PlayerData[player.getName()].level = 0;
+    let playerForgeData = _C._PlayerForgeData.get(player.getName());
+    playerForgeData.exp = Math.round((playerForgeData.exp + addxp) * 10000) / 10000;
+    playerForgeData.exp = Number(playerForgeData.exp.toFixed(2));// 防止浮点数错误
+    playerForgeData.level = Math.floor(eval(_C.MainConfig.锻造等级.等级公式.replace(/{经验}/g, playerForgeData.exp.toString())));
+    if (isNaN(playerForgeData.level)) {
+        playerForgeData.level = 0;
     }
-    _C.PlayerData[player.getName()].req = eval(_C.MainConfig.锻造等级.经验公式.replace(/{等级}/g, _C.PlayerData[player.getName()].level + 1)) - _C.PlayerData[player.getName()].exp;
-    _C.PlayerData[player.getName()].req = Number(_C.PlayerData[player.getName()].req.toFixed(2));// 防止浮点数错误
-    File.writeTo("./plugins/NWeapon/PlayerData.json", JSON.stringify(_C.PlayerData, null, 2));
+    playerForgeData.req = eval(_C.MainConfig.锻造等级.经验公式.replace(/{等级}/g, (playerForgeData.level + 1).toString())) - playerForgeData.exp;
+    playerForgeData.req = Number(playerForgeData.req.toFixed(2));// 防止浮点数错误
+    _C._PlayerForgeData.set(player.getName(), playerForgeData);
     player.sendMessage("[NWeapon] 恭喜您获得了 §l" + addxp + " §r点锻造经验");
     if (_C.MainConfig.锻造词条 && itemData.锻造词条) {// 开始
-        WeaponToForgeEntry(player, weapon, index, Strength, ForgeBlueprintData, entryConfigToCraft(_C.ForgeEntry[itemData.锻造词条], itemData));
+        WeaponToForgeEntry(player, weapon, index, Strength, ForgeBlueprintData, entryConfigToCraft(_C.ForgeEntry[itemData.锻造词条] as EquipmentEntryType, itemData));
     } else {
         WeaponToForge(player, weapon, index, Strength, ForgeBlueprintData, itemData);
     }
@@ -143,17 +144,6 @@ export function ForgingFakeInvClose(event: any, player: JPlayer, inv: JInventory
     return temp;
 }
 
-interface ForgeEntryType {
-    mainEntry: {
-        list: string[]
-        p: number[]
-    }
-    ubEntry: {
-        list: string[]
-        p: number[]
-    }
-}
-
 interface EntryCompRes0Type {
     name: string;
     value: number;
@@ -171,7 +161,7 @@ interface EntryCompRes1Type {
  * @param itemConfig {Object} itemConfig.锻造属性
  * @returns {Object} obj对象
  */
- function entryConfigToCraft(forgeEntryConfig: ForgeEntryType, itemConfig: EquipmentType): [EntryCompRes0Type, EntryCompRes1Type] {
+ function entryConfigToCraft(forgeEntryConfig: EquipmentEntryType, itemConfig: EquipmentType): [EntryCompRes0Type, EntryCompRes1Type] {
     var res: [EntryCompRes0Type, EntryCompRes1Type] = [{name: "", value: 0}, {}];
     // 次词条
     var arr1: string[] = Tool.cloneObjectFn(forgeEntryConfig.ubEntry.list);
@@ -300,7 +290,7 @@ function WeaponToForgeEntry(player: JPlayer, item: JItem, index: number, Strengt
     ForgingAttrNbt.quality = index;
     ForgingAttrNbt.info.player = player.getName();
     ForgingAttrNbt.info.intensity = Strength / 100;
-    ForgingAttrNbt.info.playerlv = _C.PlayerData[player.getName()].level;
+    ForgingAttrNbt.info.playerlv = _C._PlayerForgeData[player.getName()].level;
     item.getNamedTag().putString('forging', JSON.stringify(ForgingAttrNbt));
     item.getNamedTag().putByte('entry', 1);
     item.setNamedTag(item.getNamedTag());
@@ -357,7 +347,7 @@ function WeaponToForge(player: JPlayer, item: JItem, index: number, Strength: nu
     blockitem.setItemLore(item, oldLore + lore.join(";"));
     ForgingAttrNbt.info.player = player.getName();
     ForgingAttrNbt.info.intensity = Strength / 100;
-    ForgingAttrNbt.info.playerlv = _C.PlayerData[player.getName()].level;
+    ForgingAttrNbt.info.playerlv = _C._PlayerForgeData[player.getName()].level;
     item.setNamedTag(item.getNamedTag().putString('forging', JSON.stringify(ForgingAttrNbt)));
     item = Tool.itemBindPlayer(item, player, false, true);
     if (ForgeBlueprintData.可符文) {

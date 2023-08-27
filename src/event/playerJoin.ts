@@ -11,7 +11,7 @@ pnx.listenEvent("cn.nukkit.event.player.PlayerLocallyInitializedEvent", EventPri
 	}
     /*
     // 这里的处理，似乎没意义
-	let tempAttr = File.readFrom("./plugins/NWeapon/PlayerAttrData/"+name+".json");
+	let tempAttr = File.readFrom("./plugins/NWeapon/_PlayerData/attr/"+name+".json");
 	if (tempAttr) {
         let dataMap = contain("NWeapon_PlayerAttr");
 		tempAttr = JSON.parse(tempAttr);

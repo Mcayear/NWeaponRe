@@ -13,6 +13,6 @@ pnx.listenEvent("cn.nukkit.event.player.PlayerQuitEvent", EventPriority.NORMAL, 
 	delete strengthFailedNum[name];
     /*
     // 为什么要存呢？
-	manager.writeFile("./plugins/BlocklyNukkit/NWeapon/PlayerAttrData/"+name+".json", playerAttrData);
+	manager.writeFile("./plugins/BlocklyNukkit/NWeapon/_PlayerData/attr/"+name+".json", playerAttrData);
     */
 });

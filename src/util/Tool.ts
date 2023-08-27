@@ -82,7 +82,7 @@ export function getItem(name: string | null, data: EquipmentType): JItem {
     if (data.不显示属性) {
         属性 = [data.不显示属性];
     }
-    let rune = "", gemInlay = "", lore:string = "";
+    let rune = "", gemInlay = "", lore: string = "";
     if (data.镶嵌 && data.镶嵌.length > 0) {
         gemInlay += (data.稀有度 != undefined ? ';' : '') + "§r§4§l一一一一一一一一一一";
         for (var i = 0, len = data.镶嵌.length; i < len; i++) {
@@ -172,7 +172,7 @@ export function getItem(name: string | null, data: EquipmentType): JItem {
             lore = "§r" + data.介绍;
             if (data.直升) item.getNamedTag().putInt('StraightUp', data.直升);
             if (data.幸运) item.getNamedTag().putFloat('Luck', data.幸运);
-            if (data.堆叠使用) item.getNamedTag().putString('stacking', "1");
+            if (data.堆叠使用) item.getNamedTag().putByte('stacking', 1);
             if (data.失败保护) item.getNamedTag().putByte('FailProtect', data.失败保护? 1 : 0);
             break;
         }
