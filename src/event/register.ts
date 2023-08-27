@@ -31,6 +31,11 @@ export default function () {
         });
 
     // fakeinv Close Event
+    import('../enhancements/seiko/SeikoFakeInvClose.js')
+    .catch((err) => {
+        console.warn(err.stack);
+        console.error('../improvements/seiko/SeikoFakeInvClose  loading failed.');
+    });
     import('../enhancements/strength/StrengthFakeInvClose.js')
         .catch((err) => {
             console.warn(err.stack);
